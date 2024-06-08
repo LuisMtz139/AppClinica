@@ -110,7 +110,9 @@ class Schedule extends StatelessWidget {
                               return Container(
                                 color: rangeColor,
                                 padding: const EdgeInsets.all(8.0),
-                                child: state.user.treatments.last.dateRanges![index].toRichText(),
+                                child: state
+                                    .user.treatments.last.dateRanges![index]
+                                    .toRichText(),
                               );
                             },
                           ),
@@ -219,7 +221,8 @@ class Schedule extends StatelessWidget {
       if (state is UserError) {
         currentScreen = errorScreen(
           context: context,
-          errorMessage: '${state.errorMessage}\n\nRecargando datos...',
+          errorMessage:
+              'Error al cargar citas.\n\nEstamos trabajando para solucionarlo. Por favor, intenta de nuevo en unos momentos o verifique su conexcion a internet.',
         );
         Future.delayed(const Duration(seconds: 5), () {
           userCubit.getAvailableDatesBySOAP();

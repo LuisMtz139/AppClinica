@@ -219,10 +219,7 @@ SizedBox errorScreen({required BuildContext context, required String errorMessag
   return SizedBox(
     width: MediaQuery.of(context).size.width,
     child: Padding(
-      padding: const EdgeInsets.only(
-          left: 20.0,
-          right:20.0
-      ),
+      padding: const EdgeInsets.all(20.0),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
@@ -231,15 +228,44 @@ SizedBox errorScreen({required BuildContext context, required String errorMessag
             color: Colors.red,
             size: 60,
           ),
+          const Padding(
+            padding: EdgeInsets.only(top: 16),
+            child: Text(
+              '¡Oops!',
+              style: TextStyle(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: Colors.black87,
+              ),
+            ),
+          ),
           Padding(
-            padding: const EdgeInsets.only(top: 16),
-            child: Text('Error: $errorMessage'),
-          )
+            padding: const EdgeInsets.only(top: 8),
+            child: Text(
+              errorMessage,
+              textAlign: TextAlign.center,
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.black54,
+              ),
+            ),
+          ),
+          const Padding(
+            padding: EdgeInsets.only(top: 16),
+            child: Text(
+              'Recargando datos...',
+              style: TextStyle(
+                fontSize: 16,
+                color: Colors.blueGrey,
+              ),
+            ),
+          ),
         ],
       ),
     ),
   );
 }
+
 
 SizedBox invalidStateScreen({required BuildContext context}) {
   return SizedBox(

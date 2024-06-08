@@ -30,7 +30,7 @@ class LocationCubit extends Cubit<LocationState> {
         }
       }
     } catch (e) {
-      emit(LocationError('Ocurrió un error al obtener las clínicas del SPA: $e'));
+      emit(LocationError('Ocurrió un error al obtener las clínicas del SPA\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
     }
   }
 }

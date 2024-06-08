@@ -257,7 +257,6 @@ class Login extends StatelessWidget {
           hintText: 'Clínica',
           onSelected: (Location? value) {
             if (value != null) {
-
               selectedLocation = value;
             }
           },
@@ -271,7 +270,7 @@ class Login extends StatelessWidget {
 
       if (state is LocationError) {
         currentDropDownScreen = errorScreen(
-            context: context, errorMessage: state.errorMessage.toString());
+            context: context, errorMessage: "Error al cargar sucursales");
       }
 
       return currentDropDownScreen;

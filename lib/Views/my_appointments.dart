@@ -54,7 +54,7 @@ class MyAppointments extends StatelessWidget {
             shrinkWrap: true,
             physics: const ClampingScrollPhysics(),
             itemCount:
-            state.user.treatments.last.scheduledAppointments?.length ?? 0,
+                state.user.treatments.last.scheduledAppointments?.length ?? 0,
             itemBuilder: (BuildContext context, int index) {
               if (index == 0) {
                 return Column(
@@ -69,7 +69,7 @@ class MyAppointments extends StatelessWidget {
                     ),
                     ListTile(
                         title: Text(state.user.treatments.last
-                            .scheduledAppointments![index].jiffyDateTime ??
+                                .scheduledAppointments![index].jiffyDateTime ??
                             'Error al transformar la fecha'),
                         trailing: FilledButton(
                             style: FilledButton.styleFrom(
@@ -86,7 +86,8 @@ class MyAppointments extends StatelessWidget {
                   title: Text(state.user.treatments.last
                       .scheduledAppointments![index].jiffyDateTime!),
                   trailing: FilledButton(
-                      style: FilledButton.styleFrom(backgroundColor: Colors.red),
+                      style:
+                          FilledButton.styleFrom(backgroundColor: Colors.red),
                       onPressed: () => cancelAppointment(
                           appointment: state.user.treatments.last
                               .scheduledAppointments![index]),
@@ -100,10 +101,8 @@ class MyAppointments extends StatelessWidget {
       }
 
       if (state is UserError) {
-        currentScreen = errorScreen(
-            context: context, errorMessage: '${state.errorMessage}\n\nRecargando datos...');
-        Future.delayed(
-            const Duration(seconds: 5), () {
+        currentScreen = errorScreen(context: context, errorMessage: 'Algo salió mal.\n\nEstamos trabajando para solucionarlo. Por favor, intenta de nuevo en unos momentos o verifique su conexicion a internet.');
+        Future.delayed(const Duration(seconds: 5), () {
           userCubit.getAppointmentsBySOAP();
         });
       }

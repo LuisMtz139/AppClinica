@@ -15,7 +15,8 @@ class UserCubit extends Cubit<UserState> {
   Future<bool> requestWhatsappCode(String whatsappNumber) async {
     try {
       emit(UserLoading());
-      Map<String, dynamic> data = await _repository.requestUserCode(whatsappNumber);
+      Map<String, dynamic> data =
+          await _repository.requestUserCode(whatsappNumber);
       if (data.containsKey('Error')) {
         emit(UserError(data['Error']));
         return false;
@@ -27,20 +28,24 @@ class UserCubit extends Cubit<UserState> {
           emit(UserLoaded(user: user));
           return true;
         } else {
-         emit(UserError('Ocurrió un error al registrar el número de WhatsApp'));
-         return false;
+          emit(
+              UserError('Ocurrió un error al registrar el número de WhatsApp'));
+          return false;
         }
       }
     } catch (e) {
-      emit(UserError('Ocurrió un error al solicitar el código de WhatsApp: $e'));
+      emit(
+          UserError('Ocurrió un error al solicitar el código de WhatsApp\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
       return false;
     }
   }
 
-  Future<bool> validateUserCode({required String whatsappNumber, required String userCode}) async {
+  Future<bool> validateUserCode(
+      {required String whatsappNumber, required String userCode}) async {
     try {
       emit(UserLoading());
-      Map<String, dynamic> data = await _repository.validateUserCode(whatsappNumber: whatsappNumber, userCode: userCode);
+      Map<String, dynamic> data = await _repository.validateUserCode(
+          whatsappNumber: whatsappNumber, userCode: userCode);
       if (data.containsKey('Error')) {
         emit(UserError(data['Error']));
         return false;
@@ -50,10 +55,13 @@ class UserCubit extends Cubit<UserState> {
         user.code = userCode;
         user.name = data['Name'];
         if (await _repository.updateUser(user)) {
-          NavigationService.showSnackBar(message: 'Su código ha sido verificado. Ingresando al sistema...');
+          NavigationService.showSnackBar(
+              message:
+                  'Su código ha sido verificado. Ingresando al sistema...');
 
-          Future.delayed(const Duration(seconds: 4), (){
-            NavigationService.pushReplacementNamed(NavigationService.homeScreen);
+          Future.delayed(const Duration(seconds: 4), () {
+            NavigationService.pushReplacementNamed(
+                NavigationService.homeScreen);
             //NavigationService.pushReplacementNamed(NavigationService.treatmentSelection, arguments: TreatmentSelectionArguments(isar: _repository.isar));
           });
 
@@ -65,15 +73,17 @@ class UserCubit extends Cubit<UserState> {
         }
       }
     } catch (e) {
-      emit(UserError('Ocurrió un error al validar el código de usuario: $e'));
+      emit(UserError('Ocurrió un error al validar el código de usuario\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
       return false;
     }
   }
 
-  Future<bool> loginWithCredentials({required String whatsappNumber, required String userCode}) async {
+  Future<bool> loginWithCredentials(
+      {required String whatsappNumber, required String userCode}) async {
     try {
       emit(UserLoading());
-      Map<String, dynamic> data = await _repository.loginWithCredentials(whatsappNumber: whatsappNumber, userCode: userCode);
+      Map<String, dynamic> data = await _repository.loginWithCredentials(
+          whatsappNumber: whatsappNumber, userCode: userCode);
       if (data.containsKey('Error')) {
         emit(UserError(data['Error']));
         return false;
@@ -94,7 +104,7 @@ class UserCubit extends Cubit<UserState> {
         }
       }
     } catch (e) {
-      emit(UserError('Ocurrió un error al iniciar sesión: $e'));
+      emit(UserError('Ocurrió un error al iniciar sesión\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
       return false;
     }
   }
@@ -109,7 +119,7 @@ class UserCubit extends Cubit<UserState> {
         emit(UserLoaded(user: user));
       }
     } catch (e) {
-      emit(UserError('Ocurrió un error al obtener el usuario: $e'));
+      emit(UserError('Ocurrió un error al obtener el usuario\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
     }
   }
 
@@ -118,11 +128,12 @@ class UserCubit extends Cubit<UserState> {
       await _repository.updateUser(user);
       emit(UserUpdated());
     } catch (e) {
-      emit(UserError('Ocurrió un error al actualizar el usuario: $e'));
+      emit(UserError('Ocurrió un error al actualizar el usuario'));
     }
   }
 
-  Future<void> updateUserForLogin({required User user, bool isValidation = false}) async {
+  Future<void> updateUserForLogin(
+      {required User user, bool isValidation = false}) async {
     try {
       emit(UserLoading());
       if (isValidation == false) {
@@ -131,14 +142,15 @@ class UserCubit extends Cubit<UserState> {
         }
       } else {
         if (await _repository.updateUserForValidation(user) == true) {
-          await NavigationService.pushReplacementNamed(NavigationService.dashboardScreen);
+          await NavigationService.pushReplacementNamed(
+              NavigationService.dashboardScreen);
         } else {
           emit(UserError('Error al almacenar la información del usuario'));
         }
       }
       emit(UserUpdated());
     } catch (e) {
-      emit(UserError('Ocurrió un error al actualizar el usuario: $e'));
+      emit(UserError('Ocurrió un error al actualizar el usuario\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
     }
   }
 
@@ -147,7 +159,8 @@ class UserCubit extends Cubit<UserState> {
       await _repository.updateWhatsappNumber(newNumber);
       emit(UserUpdated());
     } catch (e) {
-      emit(UserError('Ocurrió un error al actualizar el número de WhatsApp: $e'));
+      emit(UserError(
+          'Ocurrió un error al actualizar el número de WhatsApp\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
     }
   }
 
@@ -156,7 +169,8 @@ class UserCubit extends Cubit<UserState> {
       await _repository.updateCode(newCode);
       emit(UserUpdated());
     } catch (e) {
-      emit(UserError('Ocurrió un error al actualizar el código de usuario: $e'));
+      emit(
+          UserError('Ocurrió un error al actualizar el código de usuario\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
     }
   }
 
@@ -165,7 +179,7 @@ class UserCubit extends Cubit<UserState> {
       await _repository.removeWhatsappNumber();
       emit(UserUpdated());
     } catch (e) {
-      emit(UserError('Ocurrió un error al remover el número de WhatsApp: $e'));
+      emit(UserError('Ocurrió un error al remover el número de WhatsApp \n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
     }
   }
 
@@ -174,11 +188,12 @@ class UserCubit extends Cubit<UserState> {
       await _repository.removeUserCode();
       emit(UserUpdated());
     } catch (e) {
-      emit(UserError('Ocurrió un error al remover el código de usuario: $e'));
+      emit(UserError('Ocurrió un error al remover el código de usuario\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
     }
   }
 
-  Future<Map<String, dynamic>> scheduleAppointment({required DateTime day}) async {
+  Future<Map<String, dynamic>> scheduleAppointment(
+      {required DateTime day}) async {
     try {
       emit(UserLoading());
 
@@ -189,40 +204,48 @@ class UserCubit extends Cubit<UserState> {
           'scheduled': false,
           'message': 'El usuario no pudo ser encontrado.'
         };
-      } else if (user.whatsappNumber == null || user.code == null || user.location.value == null) {
+      } else if (user.whatsappNumber == null ||
+          user.code == null ||
+          user.location.value == null) {
         return {
           'scheduled': false,
           'message': 'El usuario no cuenta con todas sus credenciales.'
         };
       }
 
-      Map<String, dynamic> result =  await _repository.scheduleAppointment(
-          user: user,
-          day: day
-      );
+      Map<String, dynamic> result =
+          await _repository.scheduleAppointment(user: user, day: day);
 
       return result;
     } catch (e) {
       return {
         'scheduled': false,
-        'message': 'Ocurrió un error al agendar la cita: ${e.toString()}.'
+        'message':
+            'Ocurrió un error al agendar la cita \n Por favor intentelo de nuevo o verifique su conexicion a internet.'
       };
     }
   }
 
-  Future<bool> updateAppointment({required String whatsappNumber, required DateTime day, required DateTime previousDay}) async {
+  Future<bool> updateAppointment(
+      {required String whatsappNumber,
+      required DateTime day,
+      required DateTime previousDay}) async {
     try {
       emit(UserLoading());
       Map<String, dynamic> data = await _repository.updateAppointment(
           whatsappNumber: whatsappNumber,
-          day: day.toIso8601String().substring(0,day.toIso8601String().indexOf('.')),
-          previousDay: previousDay.toIso8601String().substring(0,day.toIso8601String().indexOf('.'))
-      );
+          day: day
+              .toIso8601String()
+              .substring(0, day.toIso8601String().indexOf('.')),
+          previousDay: previousDay
+              .toIso8601String()
+              .substring(0, day.toIso8601String().indexOf('.')));
 
       if (data.containsKey('Error')) {
         await NavigationService.showSimpleErrorAlertDialog(
             title: 'Error al actualizar',
-            content: 'Ocurrió un error al actualizar la cita.\n${data['Error']}');
+            content:
+                'Ocurrió un error al actualizar la cita.\n${data['Error']}');
         return false;
       } else if (data.containsKey('Success')) {
         if (data['Success'] != false) {
@@ -236,12 +259,13 @@ class UserCubit extends Cubit<UserState> {
     } catch (e) {
       await NavigationService.showSimpleErrorAlertDialog(
           title: 'Error al actualizar',
-          content: 'Ocurrió un error al re-agendar la cita: $e.');
+          content: 'Ocurrió un error al re-agendar la cita\n Por favor intentelo de nuevo o verifique su conexicion a internet.');
       return false;
     }
   }
 
-  Future<Map<String, dynamic>> cancelAppointment({required Appointment appointment}) async {
+  Future<Map<String, dynamic>> cancelAppointment(
+      {required Appointment appointment}) async {
     try {
       emit(UserLoading());
 
@@ -252,23 +276,23 @@ class UserCubit extends Cubit<UserState> {
           'canceled': false,
           'message': 'El usuario no pudo ser encontrado.'
         };
-      } else if (user.whatsappNumber == null || user.code == null || user.location.value == null) {
+      } else if (user.whatsappNumber == null ||
+          user.code == null ||
+          user.location.value == null) {
         return {
           'canceled': false,
           'message': 'El usuario no cuenta con todas sus credenciales.'
         };
       }
 
-      Map<String, dynamic> result =  await _repository.cancelAppointment(
-          user: user,
-          appointment: appointment
-      );
+      Map<String, dynamic> result = await _repository.cancelAppointment(
+          user: user, appointment: appointment);
 
       return result;
     } catch (e) {
       return {
         'canceled': false,
-        'message': 'Ocurrió un error al cancelar la cita: $e.'
+        'message': 'Ocurrió un error al cancelar la cita\n Por favor intentelo de nuevo o verifique su conexicion a internet..'
       };
     }
   }
@@ -277,7 +301,8 @@ class UserCubit extends Cubit<UserState> {
     try {
       emit(UserLoading());
       User? user = await _repository.getUser();
-      Map<String, dynamic> data = await _repository.loginWithCredentials(whatsappNumber: user!.whatsappNumber!, userCode: user.code!);
+      Map<String, dynamic> data = await _repository.loginWithCredentials(
+          whatsappNumber: user!.whatsappNumber!, userCode: user.code!);
       if (data.containsKey('Error')) {
         emit(UserError(data['Error']));
       } else {
@@ -285,11 +310,13 @@ class UserCubit extends Cubit<UserState> {
         if (await _repository.updateUser(user)) {
           emit(UserLoaded(user: user));
         } else {
-          emit(UserError('Ocurrió un error al actualizar la información del usuario'));
+          emit(UserError(
+              'Ocurrió un error al actualizar la información del usuario'));
         }
       }
-    } catch(e) {
-      emit(UserError('Ocurrió un error al recargar la información del usuario: $e'));
+    } catch (e) {
+      emit(UserError(
+          'Ocurrió un error al recargar la información del usuario\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
       Future.delayed(const Duration(seconds: 5), () {
         reloadUserData();
       });
@@ -308,13 +335,14 @@ class UserCubit extends Cubit<UserState> {
     emit(UserUpdated());
   }
 
-  Future<void> updateScreen({required VoidCallback action, required User user}) async {
+  Future<void> updateScreen(
+      {required VoidCallback action, required User user}) async {
     try {
       emit(UserLoading());
       action;
       emit(UserLoaded(user: user));
     } catch (e) {
-      emit(UserError('Ocurrió un error al actualizar la pantalla: $e'));
+      emit(UserError('Ocurrió un error al actualizar la pantalla\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
     }
   }
 
@@ -324,11 +352,10 @@ class UserCubit extends Cubit<UserState> {
       User? user = await _repository.getUser();
 
       if (user == null) {
-        return {
-          'validation': false,
-          'message': 'El usuario no existe.'
-        };
-      } else if (user.whatsappNumber == null || user.code == null || user.location.value == null) {
+        return {'validation': false, 'message': 'El usuario no existe.'};
+      } else if (user.whatsappNumber == null ||
+          user.code == null ||
+          user.location.value == null) {
         return {
           'validation': false,
           'message': 'El usuario no tiene todas sus credenciales.'
@@ -340,14 +367,12 @@ class UserCubit extends Cubit<UserState> {
       return result;
     } catch (e) {
       //emit(UserError('Ocurrió un error al validar la información del usuario: $e'));
-      return {
-        'validation': false,
-        'message': e.toString()
-      };
+      return {'validation': false, 'message': e.toString()};
     }
   }
 
-  Future<Map<String, dynamic>> getAppointmentsBySOAP({bool withState = true}) async {
+  Future<Map<String, dynamic>> getAppointmentsBySOAP(
+      {bool withState = true}) async {
     try {
       if (withState) {
         emit(UserLoading());
@@ -355,11 +380,10 @@ class UserCubit extends Cubit<UserState> {
       User? user = await _repository.getUser();
 
       if (user == null) {
-        return {
-          'updated': false,
-          'message': 'El usuario no existe.'
-        };
-      } else if (user.whatsappNumber == null || user.code == null || user.location.value == null) {
+        return {'updated': false, 'message': 'El usuario no existe.'};
+      } else if (user.whatsappNumber == null ||
+          user.code == null ||
+          user.location.value == null) {
         return {
           'updated': false,
           'message': 'El usuario no tiene todas sus credenciales.'
@@ -372,10 +396,10 @@ class UserCubit extends Cubit<UserState> {
         }
       });
     } catch (e) {
-      emit(UserError('Ocurrió un error al obtener las citas agendadas: $e'));
+      emit(UserError('Ocurrió un error al obtener las citas agendadas: \n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
       return {
         'updated': false,
-        'message': 'Ocurrió un error al obtener las citas agendadas: $e'
+        'message': 'Ocurrió un error al obtener las citas agendadas: \n Por favor intentelo de nuevo o verifique su conexicion a internet.'
       };
     }
   }
@@ -386,23 +410,24 @@ class UserCubit extends Cubit<UserState> {
       User? user = await _repository.getUser();
 
       if (user == null) {
-        return {
-          'updated': false,
-          'message': 'El usuario no existe.'
-        };
-      } else if (user.whatsappNumber == null || user.code == null || user.location.value == null) {
+        return {'updated': false, 'message': 'El usuario no existe.'};
+      } else if (user.whatsappNumber == null ||
+          user.code == null ||
+          user.location.value == null) {
         return {
           'updated': false,
           'message': 'El usuario no tiene todas sus credenciales.'
         };
       }
 
-      return await _repository.fetchAvailableDates(user: user).whenComplete(() => emit(UserLoaded(user: user)));
+      return await _repository
+          .fetchAvailableDates(user: user)
+          .whenComplete(() => emit(UserLoaded(user: user)));
     } catch (e) {
-      emit(UserError('Ocurrió un error al obtener las fechas disponibles: $e'));
+      emit(UserError('Ocurrió un error al obtener las fechas disponibles: \n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
       return {
         'updated': false,
-        'message': 'Ocurrió un error al obtener las fechas disponibles: $e'
+        'message': 'Ocurrió un error al obtener las fechas disponibles: \n Por favor intentelo de nuevo o verifique su conexicion a internet.'
       };
     }
   }

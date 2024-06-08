@@ -32,49 +32,51 @@ class News extends StatelessWidget {
       if (state is UserLoaded) {
         currentScreen = FutureBuilder<List<String>>(
           future: getNews(dsnDatabase: state.user.location.value!.code!),
-          builder: (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
+          builder:
+              (BuildContext context, AsyncSnapshot<List<String>> snapshot) {
             if (snapshot.hasData) {
               if (snapshot.data!.isEmpty) {
                 return Center(
-                    child: Text('No hay promociones',
-                      style: TextStyle(
-                          color: LightCenterColors.mainBrown,
-                          fontWeight: FontWeight.bold,
-                          fontSize: 24
-                      ),
-                    )
-                );
+                    child: Text(
+                  'No hay promociones',
+                  style: TextStyle(
+                      color: LightCenterColors.mainBrown,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 24),
+                ));
               }
 
               ValueNotifier<int> currentSlide = ValueNotifier(0);
-              final CarouselController carouselController = CarouselController();
+              final CarouselController carouselController =
+                  CarouselController();
 
               return Column(
                 children: [
                   Expanded(
                     child: CarouselSlider(
                         carouselController: carouselController,
-                        items: snapshot.data!.map((item) => GestureDetector(
-                          onTap: () {
-                            NavigationService.openWhatsappLink(message: '¡Hola!, quiero información de la promo "${item.substring(item.lastIndexOf('/') + 1, item.lastIndexOf('.'))}"');
-                          },
-                          child: Image.network(
-                            item,
-                            fit: BoxFit.fill,
-                            height: screenHeight,
-                          ),
-                        )).toList(),
+                        items: snapshot.data!
+                            .map((item) => GestureDetector(
+                                  onTap: () {
+                                    NavigationService.openWhatsappLink(
+                                        message:
+                                            '¡Hola!, quiero información de la promo "${item.substring(item.lastIndexOf('/') + 1, item.lastIndexOf('.'))}"');
+                                  },
+                                  child: Image.network(
+                                    item,
+                                    fit: BoxFit.fill,
+                                    height: screenHeight,
+                                  ),
+                                ))
+                            .toList(),
                         options: CarouselOptions(
                             height: screenHeight,
                             viewportFraction: 1,
                             enlargeCenterPage: false,
                             onPageChanged: (index, reason) {
                               currentSlide.value = index;
-                            }
-                        )
-                    ),
+                            })),
                   ),
-
                   ValueListenableBuilder<int>(
                     valueListenable: currentSlide,
                     builder: (context, index, _) {
@@ -84,13 +86,17 @@ class News extends StatelessWidget {
                           return Container(
                             width: 12.0,
                             height: 12.0,
-                            margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                            margin: const EdgeInsets.symmetric(
+                                vertical: 8.0, horizontal: 4.0),
                             decoration: BoxDecoration(
                                 shape: BoxShape.circle,
-                                color: (Theme.of(context).brightness == Brightness.dark
-                                    ? Colors.white
-                                    : LightCenterColors.mainPurple)
-                                    .withOpacity(currentSlide.value == entry.key ? 0.9 : 0.4)),
+                                color: (Theme.of(context).brightness ==
+                                            Brightness.dark
+                                        ? Colors.white
+                                        : LightCenterColors.mainPurple)
+                                    .withOpacity(currentSlide.value == entry.key
+                                        ? 0.9
+                                        : 0.4)),
                           );
                         }).toList(),
                       );
@@ -99,7 +105,10 @@ class News extends StatelessWidget {
                 ],
               );
             } else if (snapshot.hasError) {
-              return errorScreen(context: context, errorMessage: snapshot.error.toString());
+              return errorScreen(
+                  context: context,
+                  errorMessage:
+                      "Error al cargar las promociones.\n\nEstamos trabajando para solucionarlo. Por favor, intenta de nuevo en unos momentos o verifique su conexicion a internet.");
             } else {
               return loadingScreen(context: context);
             }
@@ -108,23 +117,22 @@ class News extends StatelessWidget {
       }
 
       if (state is UserError) {
-        currentScreen = errorScreen(context: context, errorMessage: state.errorMessage.toString());
+        currentScreen = errorScreen(
+            context: context, errorMessage: state.errorMessage.toString());
       }
 
       currentScreen ??= invalidStateScreen(context: context);
 
       return Scaffold(
-        appBar: commonAppBar(
-            title: const Text('Promociones'),
-            actions: [
-              IconButton(
-                  onPressed: () => NavigationService.showSimpleErrorAlertDialog(
+        appBar: commonAppBar(title: const Text('Promociones'), actions: [
+          IconButton(
+              onPressed: () => NavigationService.showSimpleErrorAlertDialog(
                     title: '¿Cómo funciona?',
-                    content: 'Deslice su dedo de izquierda a derecha para mostrar la siguiente imagen, para regresar a la imagen anterior, deslice de derecha a izquierda.\n\nDe un toque a una imagen para solicitar información de la promoción por Whatsapp.',
+                    content:
+                        'Deslice su dedo de izquierda a derecha para mostrar la siguiente imagen, para regresar a la imagen anterior, deslice de derecha a izquierda.\n\nDe un toque a una imagen para solicitar información de la promoción por Whatsapp.',
                   ),
-                  icon: const Icon(Icons.help))
-            ]
-        ),
+              icon: const Icon(Icons.help))
+        ]),
         body: currentScreen,
       );
     });
@@ -138,8 +146,7 @@ Future<List<String>> getNews({required String dsnDatabase}) async {
       content: {
         'DSNDataBase': dsnDatabase,
         'NomFuncion': 'PROMOSVIGENTES',
-      }
-  );
+      });
 
   if (data.contains('ERR:') || data.length == 1) {
     if (data.length == 1) {
@@ -147,7 +154,8 @@ Future<List<String>> getNews({required String dsnDatabase}) async {
     } else {
       data = data.replaceAll("ERR: ", "");
     }
-    await NavigationService.showSimpleErrorAlertDialog(title: 'Error', content: 'Ocurrió un error al obtener las promociones');
+    await NavigationService.showSimpleErrorAlertDialog(
+        title: 'Error', content: 'Ocurrió un error al obtener las promociones');
 
     return [];
   } else {

@@ -53,7 +53,7 @@ class Payments extends StatelessWidget {
               ),
             );
           } else if (snapshot.hasError) {
-            return errorScreen(context: context, errorMessage: snapshot.error.toString());
+            return errorScreen(context: context, errorMessage: "Error al cargar sus pagos.\n\nEstamos trabajando para solucionarlo. Por favor, intenta de nuevo en unos momentos o verifique su conexicion a internet.");
           } else {
             return loadingScreen(context: context);
           }

@@ -36,25 +36,25 @@ class Dashboard extends StatelessWidget {
             child: Column(
               children: [
                 Visibility(
-                  visible: state.user.treatments.isNotEmpty && state.user.treatments.last.scheduledAppointments != null && state.user.treatments.last.scheduledAppointments!.isNotEmpty,
+                    visible: state.user.treatments.isNotEmpty &&
+                        state.user.treatments.last.scheduledAppointments !=
+                            null &&
+                        state.user.treatments.last.scheduledAppointments!
+                            .isNotEmpty,
                     child: Container(
                         decoration: BoxDecoration(
                           color: LightCenterColors.mainPurple.withOpacity(0.9),
                         ),
-                        child: Text('Su próxima cita es el día ${state.user.treatments.isNotEmpty && state.user.treatments.last.scheduledAppointments!.isNotEmpty ? state.user.treatments.last.scheduledAppointments!.first.jiffyDate : ''}',
+                        child: Text(
+                          'Su próxima cita es el día ${state.user.treatments.isNotEmpty && state.user.treatments.last.scheduledAppointments!.isNotEmpty ? state.user.treatments.last.scheduledAppointments!.first.jiffyDate : ''}',
                           textAlign: TextAlign.center,
                           style: const TextStyle(
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16
-                          ),
-                        ))
-                ),
-
+                              fontWeight: FontWeight.bold, fontSize: 16),
+                        ))),
                 Padding(
                   padding: EdgeInsets.only(
                       top: MediaQuery.of(context).size.height * 0.01,
-                      bottom: MediaQuery.of(context).size.height * 0.01
-                  ),
+                      bottom: MediaQuery.of(context).size.height * 0.01),
                   child: SizedBox(
                     width: MediaQuery.of(context).size.width * 0.8,
                     height: MediaQuery.of(context).size.height * 0.25,
@@ -65,10 +65,11 @@ class Dashboard extends StatelessWidget {
                         children: [
                           CircleAvatar(
                             minRadius: MediaQuery.of(context).size.width * 0.1,
-                            child: Image.asset("assets/images/icon-512.png", width: MediaQuery.of(context).size.width * 0.2),
+                            child: Image.asset("assets/images/icon-512.png",
+                                width: MediaQuery.of(context).size.width * 0.2),
                           ),
-
-                          Text(state.user.name!.toPascalCase(),
+                          Text(
+                            state.user.name!.toPascalCase(),
                             textAlign: TextAlign.center,
                             style: const TextStyle(
                               fontWeight: FontWeight.bold,
@@ -77,47 +78,50 @@ class Dashboard extends StatelessWidget {
                           Text(state.user.whatsappNumber!,
                               style: const TextStyle(
                                 fontWeight: FontWeight.bold,
-                              )
-                          ),
+                              )),
                         ],
                       ),
                     ),
                   ),
                 ),
-
                 Padding(
                   padding: EdgeInsets.only(
                       top: MediaQuery.of(context).size.height * 0.02,
                       left: MediaQuery.of(context).size.width * 0.02,
-                      right: MediaQuery.of(context).size.width * 0.02
-                  ),
+                      right: MediaQuery.of(context).size.width * 0.02),
                   child: GridView(
                     physics: const NeverScrollableScrollPhysics(),
                     shrinkWrap: true,
-                    gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
-                        crossAxisCount: 2,
-                        childAspectRatio: 4/3,
-                        mainAxisSpacing: 20,
-                        crossAxisSpacing: 10,
+                    gridDelegate:
+                        const SliverGridDelegateWithFixedCrossAxisCount(
+                      crossAxisCount: 2,
+                      childAspectRatio: 4 / 3,
+                      mainAxisSpacing: 20,
+                      crossAxisSpacing: 10,
                     ),
                     children: [
                       GestureDetector(
-                        onTap: () => NavigationService.pushNamed(NavigationService.homeScreen),
+                        onTap: () => NavigationService.pushNamed(
+                            NavigationService.homeScreen),
                         child: Card(
                           color: const Color.fromRGBO(119, 61, 190, 1),
                           child: Container(
                             width: MediaQuery.of(context).size.width * 0.4,
                             height: MediaQuery.of(context).size.height * 0.15,
                             decoration: BoxDecoration(
-                              borderRadius: BorderRadius.circular(35.0),
-                              image: const DecorationImage(image: AssetImage("assets/images/mis_citas.png"), fit: BoxFit.fill)
-                            ),
+                                borderRadius: BorderRadius.circular(35.0),
+                                image: const DecorationImage(
+                                    image: AssetImage(
+                                        "assets/images/mis_citas.png"),
+                                    fit: BoxFit.fill)),
                           ),
                         ),
                       ),
-
                       GestureDetector(
-                        onTap: () => Navigator.of(context).push(MaterialPageRoute(builder: (context) => Payments(user: state.user))),
+                        onTap: () => Navigator.of(context).push(
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    Payments(user: state.user))),
                         child: Card(
                           color: const Color.fromRGBO(97, 39, 159, 1),
                           child: Container(
@@ -125,14 +129,16 @@ class Dashboard extends StatelessWidget {
                             height: MediaQuery.of(context).size.height * 0.15,
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(35.0),
-                                image: const DecorationImage(image: AssetImage("assets/images/mis_pagos.jpg"), fit: BoxFit.fill)
-                            ),
+                                image: const DecorationImage(
+                                    image: AssetImage(
+                                        "assets/images/mis_pagos.jpg"),
+                                    fit: BoxFit.fill)),
                           ),
                         ),
                       ),
-
                       GestureDetector(
-                        onTap: () => NavigationService.pushNamed(NavigationService.news),
+                        onTap: () =>
+                            NavigationService.pushNamed(NavigationService.news),
                         child: Card(
                           color: const Color.fromRGBO(224, 23, 131, 1),
                           child: Container(
@@ -140,12 +146,13 @@ class Dashboard extends StatelessWidget {
                             height: MediaQuery.of(context).size.height * 0.15,
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(35.0),
-                                image: const DecorationImage(image: AssetImage("assets/images/promociones.png"), fit: BoxFit.fill)
-                            ),
+                                image: const DecorationImage(
+                                    image: AssetImage(
+                                        "assets/images/promociones.png"),
+                                    fit: BoxFit.fill)),
                           ),
                         ),
                       ),
-
                       GestureDetector(
                         onTap: () => NavigationService.openLoyalty(),
                         child: Card(
@@ -155,8 +162,10 @@ class Dashboard extends StatelessWidget {
                             height: MediaQuery.of(context).size.height * 0.15,
                             decoration: BoxDecoration(
                                 borderRadius: BorderRadius.circular(35.0),
-                                image: const DecorationImage(image: AssetImage("assets/images/programa_lealtad.jpg"), fit: BoxFit.fill)
-                            ),
+                                image: const DecorationImage(
+                                    image: AssetImage(
+                                        "assets/images/programa_lealtad.jpg"),
+                                    fit: BoxFit.fill)),
                           ),
                         ),
                       ),
@@ -169,7 +178,10 @@ class Dashboard extends StatelessWidget {
         }
 
         if (state is UserError) {
-          currentScreen = errorScreen(context: context, errorMessage: state.errorMessage.toString());
+          currentScreen = errorScreen(
+              context: context,
+              errorMessage:
+                  "Algo salió mal.\n\nEstamos trabajando para solucionarlo. Por favor, intenta de nuevo en unos momentos o verifique su conexicion a internet.");
         }
 
         currentScreen ??= invalidStateScreen(context: context);

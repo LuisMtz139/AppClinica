@@ -14,7 +14,7 @@ class TreatmentCubit extends Cubit<TreatmentState> {
       await _repository.updateTreatment(treatment);
       emit(TreatmentUpdated());
     } catch (e) {
-      emit(TreatmentError('Ocurrió un error al actualizar el tratamiento: $e'));
+      emit(TreatmentError('Ocurrió un error al actualizar el tratamiento\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
     }
   }
 
@@ -25,7 +25,7 @@ class TreatmentCubit extends Cubit<TreatmentState> {
       emit(TreatmentLoaded(treatment: currentTreatment));
       return await _repository.getTreatmentByOrderId(orderId);
     } catch (e) {
-      emit(TreatmentError('Ocurrió un error al obtener el tratamiento: $e'));
+      emit(TreatmentError('Ocurrió un error al obtener el tratamiento\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
       return null;
     }
   }
