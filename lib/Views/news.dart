@@ -59,8 +59,7 @@ class News extends StatelessWidget {
                             .map((item) => GestureDetector(
                                   onTap: () {
                                     NavigationService.openWhatsappLink(
-                                        message:
-                                            '¡Hola!, quiero información de la promo "${item.substring(item.lastIndexOf('/') + 1, item.lastIndexOf('.'))}"');
+                                    );
                                   },
                                   child: Image.network(
                                     item,

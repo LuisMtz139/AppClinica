@@ -7,6 +7,7 @@ import 'package:light_center/Views/news.dart';
 import 'package:light_center/Views/pdf.dart';
 import 'package:light_center/Views/splash.dart';
 import 'package:light_center/Views/treatment_selection.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class NavigationService {
@@ -129,23 +130,56 @@ class NavigationService {
     );
   }
 
-  static void makeCall({String phoneNumber = '5219995514492'}) async {
-    Uri requestUri = Uri(scheme: 'tel', path: phoneNumber);
+  Future<void> printLocalStorageValues() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? wp = prefs.getString('wp');
+    String? email = prefs.getString('email');
+    String? tel = prefs.getString('tel');
+
+    print('Valores del local storage:');
+    print('wp: $wp');
+    print('email: $email');
+    print('tel: $tel');
+  }
+
+  //imprimer a tel en tel de makecall
+  static void makeCall() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? wp = prefs.getString('wp');
+    String? email = prefs.getString('email');
+    String? tel = prefs.getString('tel');
+
+    print('tel: $tel');
+
+    Uri requestUri = Uri(scheme: 'tel', path: tel);
 
     if (await canLaunchUrl(requestUri)) {
       await launchUrl(requestUri);
     }
   }
 
-  static void openWhatsappLink({String message = ''}) async {
-    Uri requestUri = Uri.https('wa.me', '/5219994916865', {'text': message});
-    if (await canLaunchUrl(requestUri)) {
-      await launchUrl(requestUri, mode: LaunchMode.inAppWebView);
+  static Future<void> openWhatsappLink() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? wp = prefs.getString('wp');
+    String countryCode = "1"; // Reemplaza esto con tu código de país
+    String messge =
+        'Hola, me gustaría recibir información sobre los tratamientos que ofrecen.';
+  
+    // Check if wp is not null
+    if (wp != null) {
+      Uri requestUri = Uri.https('wa.me', '/$countryCode$wp', {'text': messge});
+      if (await canLaunchUrl(requestUri)) {
+        await launchUrl(requestUri, mode: LaunchMode.inAppWebView);
+      }
+    } else {
+      // Handle the case where wp is null
+      print('Error: No se encontró el número de WhatsApp.');
     }
   }
 
   static void sendEmail(
       {String email = 'lightcenterclinicas@predictionsoft.com.mx'}) async {
+        
     Uri requestUri = Uri(scheme: 'mailto', path: email);
 
     if (await canLaunchUrl(requestUri)) {
@@ -153,16 +187,21 @@ class NavigationService {
     }
   }
 
-static Future<dynamic> openInternalRegulations() async {
-  return _navigationKey.currentState!.push(MaterialPageRoute(
-      builder: (context) => PDFScreen(pdfName: 'http://144.126.130.95/ImgsRobotWhatsApp/LightCenterClinicas/Reglamento%20Interno.pdf', isURL: true)));
-}
+  static Future<dynamic> openInternalRegulations() async {
+    return _navigationKey.currentState!.push(MaterialPageRoute(
+        builder: (context) => PDFScreen(
+            pdfName:
+                'http://144.126.130.95/ImgsRobotWhatsApp/LightCenterClinicas/Reglamento%20Interno.pdf',
+            isURL: true)));
+  }
 
-
-static Future<dynamic> openSessionIndications() async {
-  return _navigationKey.currentState!.push(MaterialPageRoute(
-      builder: (context) => PDFScreen(pdfName: 'http://144.126.130.95/ImgsRobotWhatsApp/LightCenterClinicas/Indicaciones%20para%20Sesiones.pdf', isURL: true)));
-}
+  static Future<dynamic> openSessionIndications() async {
+    return _navigationKey.currentState!.push(MaterialPageRoute(
+        builder: (context) => PDFScreen(
+            pdfName:
+                'http://144.126.130.95/ImgsRobotWhatsApp/LightCenterClinicas/Indicaciones%20para%20Sesiones.pdf',
+            isURL: true)));
+  }
 
   static Future<dynamic> openOnlinePDF({required String url}) async {
     return _navigationKey.currentState!.push(MaterialPageRoute(

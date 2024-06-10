@@ -34,8 +34,8 @@ class UserCubit extends Cubit<UserState> {
         }
       }
     } catch (e) {
-      emit(
-          UserError('Ocurrió un error al solicitar el código de WhatsApp\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
+      emit(UserError(
+          'Ocurrió un error al solicitar el código de WhatsApp\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
       return false;
     }
   }
@@ -73,7 +73,8 @@ class UserCubit extends Cubit<UserState> {
         }
       }
     } catch (e) {
-      emit(UserError('Ocurrió un error al validar el código de usuario\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
+      emit(UserError(
+          'Ocurrió un error al validar el código de usuario\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
       return false;
     }
   }
@@ -104,7 +105,8 @@ class UserCubit extends Cubit<UserState> {
         }
       }
     } catch (e) {
-      emit(UserError('Ocurrió un error al iniciar sesión\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
+      emit(UserError(
+          'Ocurrió un error al iniciar sesión\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
       return false;
     }
   }
@@ -116,10 +118,13 @@ class UserCubit extends Cubit<UserState> {
       if (user == null) {
         emit(UserLoaded(user: User()));
       } else {
+        // Carga los tratamientos si es necesario
+        await user.treatments.load();
         emit(UserLoaded(user: user));
       }
     } catch (e) {
-      emit(UserError('Ocurrió un error al obtener el usuario\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
+      emit(UserError(
+          'Ocurrió un error al obtener el usuario\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
     }
   }
 
@@ -150,7 +155,8 @@ class UserCubit extends Cubit<UserState> {
       }
       emit(UserUpdated());
     } catch (e) {
-      emit(UserError('Ocurrió un error al actualizar el usuario\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
+      emit(UserError(
+          'Ocurrió un error al actualizar el usuario\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
     }
   }
 
@@ -169,8 +175,8 @@ class UserCubit extends Cubit<UserState> {
       await _repository.updateCode(newCode);
       emit(UserUpdated());
     } catch (e) {
-      emit(
-          UserError('Ocurrió un error al actualizar el código de usuario\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
+      emit(UserError(
+          'Ocurrió un error al actualizar el código de usuario\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
     }
   }
 
@@ -179,7 +185,8 @@ class UserCubit extends Cubit<UserState> {
       await _repository.removeWhatsappNumber();
       emit(UserUpdated());
     } catch (e) {
-      emit(UserError('Ocurrió un error al remover el número de WhatsApp \n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
+      emit(UserError(
+          'Ocurrió un error al remover el número de WhatsApp \n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
     }
   }
 
@@ -188,7 +195,8 @@ class UserCubit extends Cubit<UserState> {
       await _repository.removeUserCode();
       emit(UserUpdated());
     } catch (e) {
-      emit(UserError('Ocurrió un error al remover el código de usuario\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
+      emit(UserError(
+          'Ocurrió un error al remover el código de usuario\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
     }
   }
 
@@ -259,7 +267,8 @@ class UserCubit extends Cubit<UserState> {
     } catch (e) {
       await NavigationService.showSimpleErrorAlertDialog(
           title: 'Error al actualizar',
-          content: 'Ocurrió un error al re-agendar la cita\n Por favor intentelo de nuevo o verifique su conexicion a internet.');
+          content:
+              'Ocurrió un error al re-agendar la cita\n Por favor intentelo de nuevo o verifique su conexicion a internet.');
       return false;
     }
   }
@@ -292,7 +301,8 @@ class UserCubit extends Cubit<UserState> {
     } catch (e) {
       return {
         'canceled': false,
-        'message': 'Ocurrió un error al cancelar la cita\n Por favor intentelo de nuevo o verifique su conexicion a internet..'
+        'message':
+            'Ocurrió un error al cancelar la cita\n Por favor intentelo de nuevo o verifique su conexicion a internet..'
       };
     }
   }
@@ -342,7 +352,8 @@ class UserCubit extends Cubit<UserState> {
       action;
       emit(UserLoaded(user: user));
     } catch (e) {
-      emit(UserError('Ocurrió un error al actualizar la pantalla\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
+      emit(UserError(
+          'Ocurrió un error al actualizar la pantalla\n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
     }
   }
 
@@ -396,10 +407,12 @@ class UserCubit extends Cubit<UserState> {
         }
       });
     } catch (e) {
-      emit(UserError('Ocurrió un error al obtener las citas agendadas: \n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
+      emit(UserError(
+          'Ocurrió un error al obtener las citas agendadas: \n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
       return {
         'updated': false,
-        'message': 'Ocurrió un error al obtener las citas agendadas: \n Por favor intentelo de nuevo o verifique su conexicion a internet.'
+        'message':
+            'Ocurrió un error al obtener las citas agendadas: \n Por favor intentelo de nuevo o verifique su conexicion a internet.'
       };
     }
   }
@@ -424,10 +437,12 @@ class UserCubit extends Cubit<UserState> {
           .fetchAvailableDates(user: user)
           .whenComplete(() => emit(UserLoaded(user: user)));
     } catch (e) {
-      emit(UserError('Ocurrió un error al obtener las fechas disponibles: \n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
+      emit(UserError(
+          'Ocurrió un error al obtener las fechas disponibles: \n Por favor intentelo de nuevo o verifique su conexicion a internet.'));
       return {
         'updated': false,
-        'message': 'Ocurrió un error al obtener las fechas disponibles: \n Por favor intentelo de nuevo o verifique su conexicion a internet.'
+        'message':
+            'Ocurrió un error al obtener las fechas disponibles: \n Por favor intentelo de nuevo o verifique su conexicion a internet.'
       };
     }
   }

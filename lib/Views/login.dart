@@ -6,6 +6,7 @@ import 'package:light_center/BusinessLogic/Cubits/Treatment/treatment_cubit.dart
 import 'package:light_center/BusinessLogic/Cubits/User/user_cubit.dart';
 import 'package:light_center/Data/Models/Location/location_model.dart';
 import 'package:light_center/Services/navigation_service.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'custom_widgets.dart';
 import 'package:light_center/BusinessLogic/Controllers/login_controller.dart';
 
@@ -247,24 +248,71 @@ class Login extends StatelessWidget {
       }
 
       if (state is LocationsLoaded) {
-        selectedLocation ??= state.locationsList.first;
+        // Si selectedLocation no está en la lista de locations, configúralo a null
+        if (!state.locationsList.contains(selectedLocation)) {
+          selectedLocation = null;
+        }
 
-        currentDropDownScreen = DropdownMenu<Location>(
-          initialSelection: state.locationsList
-              .where((element) => element.id == selectedLocation?.id)
-              .first,
-          leadingIcon: const Icon(Icons.location_city),
-          hintText: 'Clínica',
-          onSelected: (Location? value) {
+        currentDropDownScreen = DropdownButtonFormField<Location>(
+          value: selectedLocation,
+          decoration: const InputDecoration(
+            labelText: 'Clínica',
+            prefixIcon: Icon(Icons.location_city),
+          ),
+          hint: const Text('Seleccione una clínica'),
+          items: [
+            DropdownMenuItem<Location>(
+              value: null,
+              child: Text(
+                'Seleccione una clínica',
+                style: TextStyle(color: Colors.grey),
+              ),
+            ),
+            ...state.locationsList
+                .map<DropdownMenuItem<Location>>((Location value) {
+              return DropdownMenuItem<Location>(
+                value: value,
+                child: Text(value.city!.split(' wp:')[0]),
+              );
+            }).toList(),
+          ],
+          onTap: () {
+            // Imprimir los nombres de las ciudades del menú desplegable en la consola
+            print('Opciones del menú desplegable:');
+            state.locationsList.forEach((location) {
+              print(location.city!.split(' wp:')[0]);
+            });
+          },
+          onChanged: (Location? value) async {
             if (value != null) {
               selectedLocation = value;
+              // Imprimir los detalles completos de la ciudad seleccionada en la consola
+              print('Detalles de la ciudad seleccionada: ${value.city}');
+
+              // Extraer wp, email, y tel de los detalles de la ciudad seleccionada
+              final cityDetails = value.city!.split(',');
+              final wp = cityDetails[1].split(':')[1].trim();
+              final email = cityDetails[2].split(':')[1].trim();
+              final tel = cityDetails[3].split(':')[1].trim();
+
+              // Guardar wp, email, y tel en local storage
+              SharedPreferences prefs = await SharedPreferences.getInstance();
+              await prefs.setString('wp', wp);
+              await prefs.setString('email', email);
+              await prefs.setString('tel', tel);
+
+              // Imprimir valores del local storage
+              printLocalStorageValues();
+            } else {
+              selectedLocation = null;
             }
           },
-          dropdownMenuEntries: state.locationsList
-              .map<DropdownMenuEntry<Location>>((Location value) {
-            return DropdownMenuEntry<Location>(
-                value: value, label: value.city!);
-          }).toList(),
+          validator: (Location? value) {
+            if (value == null) {
+              return 'Por favor seleccione una clínica';
+            }
+            return null;
+          },
         );
       }
 
@@ -275,5 +323,17 @@ class Login extends StatelessWidget {
 
       return currentDropDownScreen;
     });
+  }
+
+  Future<void> printLocalStorageValues() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? wp = prefs.getString('wp');
+    String? email = prefs.getString('email');
+    String? tel = prefs.getString('tel');
+
+    print('Valores del local storage:');
+    print('wp: $wp');
+    print('email: $email');
+    print('tel: $tel');
   }
 }
