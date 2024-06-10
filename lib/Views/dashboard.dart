@@ -137,8 +137,9 @@ class Dashboard extends StatelessWidget {
                         ),
                       ),
                       GestureDetector(
-                        onTap: () =>
-                            NavigationService.pushNamed(NavigationService.news),
+                        onTap: () => NavigationService.openOnlinePDF(
+                            url:
+                                'http://144.126.130.95/ImgsRobotWhatsApp/LightCenterClinicas/Puntospremiumlightcenter.pdf'),
                         child: Card(
                           color: const Color.fromRGBO(224, 23, 131, 1),
                           child: Container(
