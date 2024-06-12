@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart'; // Importa el paquete
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:isar/isar.dart';
 import 'package:jiffy/jiffy.dart';
@@ -15,12 +16,19 @@ import 'package:light_center/colors.dart';
 import 'package:light_center/Data/Repositories/user_repository.dart';
 import 'package:light_center/Data/Repositories/treatment_repository.dart';
 
-void main() async { 
+void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Jiffy.setLocale('es_us');
 
   final IsarService isar = IsarService();
   isar.open();
+
+  // Bloquea la rotación de la pantalla a sólo retrato
+  SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitUp,
+    DeviceOrientation.portraitDown,
+  ]);
+
   runApp(LightCenter(isar: await isar.db));
 }
 
@@ -39,21 +47,23 @@ class _LightCenterState extends State<LightCenter> {
 
     return MultiBlocProvider(
         providers: [
-          BlocProvider<UserCubit>(create: (_) => UserCubit(UserRepository(widget.isar))),
-          BlocProvider<TreatmentCubit>(create: (_) => TreatmentCubit(TreatmentRepository(widget.isar))),
-          BlocProvider<LocationCubit>(create: (_) => LocationCubit(LocationRepository(widget.isar))),
+          BlocProvider<UserCubit>(
+              create: (_) => UserCubit(UserRepository(widget.isar))),
+          BlocProvider<TreatmentCubit>(
+              create: (_) => TreatmentCubit(TreatmentRepository(widget.isar))),
+          BlocProvider<LocationCubit>(
+              create: (_) => LocationCubit(LocationRepository(widget.isar))),
           BlocProvider<HomeCubit>(create: (_) => HomeCubit()),
         ],
         child: MaterialApp(
           title: 'Light Center',
           theme: ThemeData(
-              colorScheme: ColorScheme.fromSeed(seedColor: LightCenterColors.mainPurple),
+              colorScheme:
+                  ColorScheme.fromSeed(seedColor: LightCenterColors.mainPurple),
               useMaterial3: true,
-              textTheme: GoogleFonts.montserratTextTheme(
-                  Theme.of(context).textTheme
-              )
-          ),
-          debugShowCheckedModeBanner: false, // Quitsa el banner de depuración
+              textTheme:
+                  GoogleFonts.montserratTextTheme(Theme.of(context).textTheme)),
+          debugShowCheckedModeBanner: false, // Quita el banner de depuración
           initialRoute: '/',
           navigatorKey: navigationService.getKey(),
           routes: navigationService.routes,
@@ -63,11 +73,7 @@ class _LightCenterState extends State<LightCenter> {
             GlobalCupertinoLocalizations.delegate,
           ],
           locale: const Locale('es', 'MX'),
-          supportedLocales: const [
-            Locale('es', 'MX'),
-            Locale('en', 'US')
-          ],
-        )
-    );
+          supportedLocales: const [Locale('es', 'MX'), Locale('en', 'US')],
+        ));
   }
 }
