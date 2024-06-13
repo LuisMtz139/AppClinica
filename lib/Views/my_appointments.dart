@@ -6,6 +6,8 @@ import 'package:light_center/BusinessLogic/Cubits/User/user_cubit.dart';
 import 'package:light_center/BusinessLogic/Cubits/Treatment/treatment_cubit.dart';
 import 'package:light_center/Views/custom_widgets.dart';
 import 'package:light_center/colors.dart';
+import 'dart:developer' as developer;
+
 
 class MyAppointments extends StatelessWidget {
   const MyAppointments({super.key});
@@ -18,6 +20,8 @@ class MyAppointments extends StatelessWidget {
     Widget? currentScreen;
 
     return BlocBuilder<UserCubit, UserState>(builder: (context, state) {
+      developer.log('Current state: $state', name: 'MyAppointments');
+
       if (state is UserUpdated || state is UserSaved) {
         userCubit.getAppointmentsBySOAP();
         currentScreen = updatingScreen(context: context);
@@ -28,6 +32,19 @@ class MyAppointments extends StatelessWidget {
       }
 
       if (state is UserLoaded) {
+        developer.log('UserLoaded State: ${state.user}', name: 'MyAppointments');
+
+        // Imprimir detalles específicos del usuario y sus citas
+        final user = state.user;
+        developer.log('User ID: ${user.id}', name: 'MyAppointments');
+        developer.log('User Name: ${user.name}', name: 'MyAppointments');
+        for (var treatment in user.treatments) {
+          developer.log('Treatment ID: ${treatment.id}', name: 'MyAppointments');
+          for (var appointment in treatment.scheduledAppointments ?? []) {
+            developer.log('Appointment Date: ${appointment.jiffyDateTime}', name: 'MyAppointments');
+          }
+        }
+
         state.user.treatments.last.scheduledAppointments ??= [];
         if (state.user.treatments.last.scheduledAppointments!.isEmpty) {
           currentScreen = Center(
@@ -81,7 +98,7 @@ class MyAppointments extends StatelessWidget {
                   ],
                 );
               }
-
+              
               return ListTile(
                   title: Text(state.user.treatments.last
                       .scheduledAppointments![index].jiffyDateTime!),
