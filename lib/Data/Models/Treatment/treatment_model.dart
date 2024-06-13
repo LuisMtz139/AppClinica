@@ -31,15 +31,15 @@ class Appointment {
   Appointment({this.id, this.date, this.time});
 
   DateTime? get dateTime => date != null && time != null
-      ? Jiffy.parse('${date!} ${time!}', pattern: 'dd/MM/yyyy h:mm:ss').dateTime
+      ? Jiffy.parse('${date!} ${time!}', pattern: 'dd/MM/yyyy H:mm:ss').dateTime
       : null;
   String? get jiffyDate => date != null
       ? Jiffy.parse(date!, pattern: 'dd/MM/yyyy').yMMMMEEEEd
       : null;
   String? get jiffyTime =>
-      time != null ? Jiffy.parse(time!, pattern: 'h:mm:ss').jms : null;
+      time != null ? Jiffy.parse(time!, pattern: 'H:mm:ss').jms : null;
   String? get jiffyDateTime => date != null && time != null
-      ? Jiffy.parse('${date!} ${time!}', pattern: 'dd/MM/yyyy h:mm:ss')
+      ? Jiffy.parse('${date!} ${time!}', pattern: 'dd/MM/yyyy H:mm:ss')
           .yMMMMEEEEdjm
       : null;
 }

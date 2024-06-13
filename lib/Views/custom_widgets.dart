@@ -243,7 +243,8 @@ SizedBox errorScreen(
           const Padding(
             padding: EdgeInsets.only(top: 16),
             child: Text(
-              'Recargando datos...',
+              //
+              'Cargando datos... Verifique la conexion a internet',
               style: TextStyle(
                 fontSize: 16,
                 color: Colors.blueGrey,

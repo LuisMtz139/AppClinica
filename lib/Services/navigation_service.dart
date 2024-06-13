@@ -164,7 +164,7 @@ class NavigationService {
     String countryCode = "1"; // Reemplaza esto con tu código de país
     String messge =
         'Hola, me gustaría recibir información sobre los tratamientos que ofrecen.';
-  
+
     // Check if wp is not null
     if (wp != null) {
       Uri requestUri = Uri.https('wa.me', '/$countryCode$wp', {'text': messge});
@@ -179,7 +179,6 @@ class NavigationService {
 
   static void sendEmail(
       {String email = 'lightcenterclinicas@predictionsoft.com.mx'}) async {
-        
     Uri requestUri = Uri(scheme: 'mailto', path: email);
 
     if (await canLaunchUrl(requestUri)) {
@@ -210,7 +209,10 @@ class NavigationService {
 
   static Future<dynamic> openLoyalty() async {
     return _navigationKey.currentState!.push(MaterialPageRoute(
-        builder: (context) => const PDFScreen(pdfName: 'Programa de lealtad')));
+        builder: (context) => PDFScreen(
+            pdfName:
+                'http://144.126.130.95/ImgsRobotWhatsApp/LightCenterClinicas/Puntospremiumlightcenter.pdf',
+            isURL: true)));
   }
 
   static void openURL(
