@@ -21,22 +21,31 @@ List<DateTime> availableDates = [];
 
 void showModal(
     {required List<Appointment> events,
-    required List<String> schedule,
-    required User user}) {
+      required List<String> schedule,
+      required User user}) {
   showModalBottomSheet<void>(
     context: NavigationService.context(),
     isDismissible: false,
     isScrollControlled: true,
     enableDrag: false,
     builder: (BuildContext context) {
-      return eventsModalSheet(
-          selectedDay: selectedDay.value!,
-          events: eventsList,
-          schedule: schedule,
-          user: user);
+      final height = MediaQuery.of(context).size.height;
+      final width = MediaQuery.of(context).size.width;
+
+      return Container(
+        height: height * 0.8, // Ajusta la altura del modal según el tamaño de la pantalla
+        padding: EdgeInsets.symmetric(
+            horizontal: width * 0.05, vertical: height * 0.02),
+        child: eventsModalSheet(
+            selectedDay: selectedDay.value!,
+            events: eventsList,
+            schedule: schedule,
+            user: user),
+      );
     },
   );
 }
+
 
 List<Appointment> getEventsForDay() {
   return eventsList

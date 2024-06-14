@@ -303,16 +303,21 @@ SizedBox invalidScreen({required BuildContext context}) {
   );
 }
 
-SizedBox eventsModalSheet(
-    {required DateTime selectedDay,
-    required List<Appointment> events,
-    required List<String> schedule,
-    required User user}) {
+SizedBox eventsModalSheet({
+  required DateTime selectedDay,
+  required List<Appointment> events,
+  required List<String> schedule,
+  required User user,
+}) {
   events = events
       .where((event) => DateUtils.isSameDay(event.dateTime, selectedDay))
       .toList();
+
+  final double screenHeight = MediaQuery.of(NavigationService.context()).size.height;
+  final double screenWidth = MediaQuery.of(NavigationService.context()).size.width;
+
   return SizedBox(
-    height: MediaQuery.of(NavigationService.context()).size.height * 0.6,
+    height: screenHeight * 0.6,
     child: SingleChildScrollView(
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -322,56 +327,59 @@ SizedBox eventsModalSheet(
             padding: const EdgeInsets.all(20.0),
             child: Row(
               children: [
-                Center(
-                  child: Text(
-                    "${DateFormat.EEEE('es-MX').format(selectedDay)}, ${DateFormat.yMMMMd('es-MX').format(selectedDay)}",
-                    style: TextStyle(
+                Expanded(
+                  child: Center(
+                    child: Text(
+                      "${DateFormat.EEEE('es-MX').format(selectedDay)}, ${DateFormat.yMMMMd('es-MX').format(selectedDay)}",
+                      style: TextStyle(
                         fontWeight: FontWeight.bold,
-                        fontSize: 22,
-                        color: LightCenterColors.mainBrown),
+                        fontSize: screenWidth * 0.06, // Ajuste del tamaño de la fuente
+                        color: LightCenterColors.mainBrown,
+                      ),
+                      textAlign: TextAlign.center,
+                    ),
                   ),
                 ),
-                const Spacer(),
-                Flexible(
-                  child: IconButton(
-                      onPressed: () => NavigationService.pop(),
-                      icon: Icon(Icons.close,
-                          color: LightCenterColors.mainPurple)),
-                )
+                IconButton(
+                  onPressed: () => NavigationService.pop(),
+                  icon: Icon(Icons.close, color: LightCenterColors.mainPurple),
+                ),
               ],
             ),
           ),
           Visibility(
-              visible: events.isNotEmpty,
-              child: Padding(
-                padding: const EdgeInsets.only(bottom: 20.0),
-                child: SizedBox(
-                  width: MediaQuery.of(NavigationService.context()).size.width *
-                      0.9,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisSize: MainAxisSize.min,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(bottom: 8.0),
-                        child: Text(
-                          'Citas agendadas',
-                          style: TextStyle(
-                              fontWeight: FontWeight.bold,
-                              fontSize: 18,
-                              color: LightCenterColors.mainPurple),
+            visible: events.isNotEmpty,
+            child: Padding(
+              padding: const EdgeInsets.only(bottom: 20.0),
+              child: SizedBox(
+                width: screenWidth * 0.9,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 8.0),
+                      child: Text(
+                        'Citas agendadas',
+                        style: TextStyle(
+                          fontWeight: FontWeight.bold,
+                          fontSize: screenWidth * 0.045,
+                          color: LightCenterColors.mainPurple,
                         ),
                       ),
-                      getScheduleGrid(
-                          schedule: events,
-                          selectedDay: selectedDay,
-                          user: user),
-                    ],
-                  ),
+                    ),
+                    getScheduleGrid(
+                      schedule: events,
+                      selectedDay: selectedDay,
+                      user: user,
+                    ),
+                  ],
                 ),
-              )),
+              ),
+            ),
+          ),
           SizedBox(
-            width: MediaQuery.of(NavigationService.context()).size.width * 0.9,
+            width: screenWidth * 0.9,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               mainAxisSize: MainAxisSize.min,
@@ -381,13 +389,17 @@ SizedBox eventsModalSheet(
                   child: Text(
                     'Horas disponibles',
                     style: TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 18,
-                        color: LightCenterColors.mainPurple),
+                      fontWeight: FontWeight.bold,
+                      fontSize: screenWidth * 0.065,
+                      color: LightCenterColors.mainPurple,
+                    ),
                   ),
                 ),
                 getScheduleGrid(
-                    schedule: schedule, selectedDay: selectedDay, user: user),
+                  schedule: schedule,
+                  selectedDay: selectedDay,
+                  user: user,
+                ),
               ],
             ),
           ),

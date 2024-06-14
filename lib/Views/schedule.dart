@@ -70,6 +70,7 @@ class Schedule extends StatelessWidget {
                 constraints.maxWidth >= 1280 && constraints.maxHeight >= 720;
 
             return SingleChildScrollView(
+              padding: EdgeInsets.all(isWideScreen ? 20.0 : 10.0),
               child: Center(
                 child: Column(
                   children: [
@@ -86,7 +87,7 @@ class Schedule extends StatelessWidget {
                     ),
                     Visibility(
                       visible:
-                          state.user.treatments.last.dateRanges!.isNotEmpty,
+                      state.user.treatments.last.dateRanges!.isNotEmpty,
                       child: SizedBox(
                         height: MediaQuery.of(context).size.height * 0.1,
                         child: Scrollbar(
@@ -98,7 +99,7 @@ class Schedule extends StatelessWidget {
                             physics: const ClampingScrollPhysics(),
                             shrinkWrap: true,
                             itemCount:
-                                state.user.treatments.last.dateRanges!.length,
+                            state.user.treatments.last.dateRanges!.length,
                             itemBuilder: (context, index) {
                               late Color rangeColor;
                               if (index % 2 == 0) {
@@ -138,7 +139,7 @@ class Schedule extends StatelessWidget {
                             eventLoader: (date) {
                               return eventsList
                                   .where((event) =>
-                                      DateUtils.isSameDay(event.dateTime, date))
+                                  DateUtils.isSameDay(event.dateTime, date))
                                   .toList();
                             },
                             selectedDayPredicate: (day) {
@@ -148,16 +149,16 @@ class Schedule extends StatelessWidget {
                               selectedDay.value = newSelectedDay;
                               focusedDay.value = newFocusedDay;
                               getDaySchedule(
-                                      day: selectedDay.value!, user: state.user)
+                                  day: selectedDay.value!, user: state.user)
                                   .then((daySchedule) {
                                 if (daySchedule
                                     .where((element) =>
-                                        element.toLowerCase().contains('error'))
+                                    element.toLowerCase().contains('error'))
                                     .toList()
                                     .isNotEmpty) {
                                   NavigationService.showSnackBar(
                                       message:
-                                          'Ocurrió un error al cargar los horarios.');
+                                      'Ocurrió un error al cargar los horarios.');
                                 } else {
                                   showModal(
                                     events: getEventsForDay(),
@@ -199,7 +200,7 @@ class Schedule extends StatelessWidget {
                                     child: Text(
                                       '${day.day}',
                                       style:
-                                          const TextStyle(color: Colors.white),
+                                      const TextStyle(color: Colors.white),
                                     ),
                                   );
                                 }
@@ -222,7 +223,7 @@ class Schedule extends StatelessWidget {
         currentScreen = errorScreen(
           context: context,
           errorMessage:
-              'Error al cargar citas.\n\nEstamos trabajando para solucionarlo. Por favor, intenta de nuevo en unos momentos o verifique su conexcion a internet.',
+          'Error al cargar citas.\n\nEstamos trabajando para solucionarlo. Por favor, intenta de nuevo en unos momentos o verifique su conexcion a internet.',
         );
         Future.delayed(const Duration(seconds: 5), () {
           userCubit.getAvailableDatesBySOAP();
