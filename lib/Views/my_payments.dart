@@ -11,49 +11,47 @@ class Payments extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-
     return Scaffold(
-      appBar: commonAppBar(
-          title: const Text('Mis Pagos'),
-          actions: [
-            IconButton(
-                onPressed: () => NavigationService.showSimpleErrorAlertDialog(
+      appBar: commonAppBar(title: const Text('Mis Pagos'), actions: [
+        IconButton(
+            onPressed: () => NavigationService.showSimpleErrorAlertDialog(
                   title: '¿Cómo funciona?',
-                  content: 'Deslice su dedo de arriba hacia abajo para continuar leyendo (en caso de ser necesario), para leer el texto anterior deslice de abajo hacia arriba.',
+                  content:
+                      'Deslice su dedo de arriba hacia abajo para continuar leyendo (en caso de ser necesario), para leer el texto anterior deslice de abajo hacia arriba.',
                 ),
-                icon: const Icon(Icons.help))
-          ]
-      ),
+            icon: const Icon(Icons.help))
+      ]),
       body: FutureBuilder<String>(
         future: getNews(user: user),
         builder: (BuildContext context, AsyncSnapshot<String> snapshot) {
           if (snapshot.hasData) {
             if (snapshot.data == '') {
               return Center(
-                  child: Text('No debe nada',
-                    style: TextStyle(
-                        color: LightCenterColors.mainBrown,
-                        fontWeight: FontWeight.bold,
-                        fontSize: 24
-                    ),
-                  )
-              );
+                  child: Text(
+                'No debe nada',
+                style: TextStyle(
+                    color: LightCenterColors.mainBrown,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 20),
+              ));
             }
 
             return Center(
               child: SingleChildScrollView(
-                physics: const ClampingScrollPhysics(),
-                  child: Text(snapshot.data!,
+                  physics: const ClampingScrollPhysics(),
+                  child: Text(
+                    snapshot.data!,
                     style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 24,
-                      color: LightCenterColors.mainPurple
-                    ),
-                  )
-              ),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 20,
+                        color: LightCenterColors.mainPurple),
+                  )),
             );
           } else if (snapshot.hasError) {
-            return errorScreen(context: context, errorMessage: "Error al cargar sus pagos.\n\nEstamos trabajando para solucionarlo. Por favor, intenta de nuevo en unos momentos o verifique su conexicion a internet.");
+            return errorScreen(
+                context: context,
+                errorMessage:
+                    "Error al cargar sus pagos.\n\nEstamos trabajando para solucionarlo. Por favor, intenta de nuevo en unos momentos o verifique su conexicion a internet.");
           } else {
             return loadingScreen(context: context);
           }
@@ -70,8 +68,7 @@ Future<String> getNews({required User user}) async {
       content: {
         'DSNDataBase': user.location.value!.code,
         'NoWhatsAPP': '521${user.whatsappNumber}',
-      }
-  );
+      });
 
   return data;
 }

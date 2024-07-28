@@ -274,9 +274,16 @@ class UserCubit extends Cubit<UserState> {
   }
 
   Future<Map<String, dynamic>> cancelAppointment(
-      {required Appointment appointment}) async {
+      {Appointment? appointment}) async {
     try {
       emit(UserLoading());
+
+      if (appointment == null) {
+        return {
+          'canceled': false,
+          'message': 'No se proporcionó información de la cita.'
+        };
+      }
 
       User? user = await _repository.getUser();
 
@@ -285,12 +292,21 @@ class UserCubit extends Cubit<UserState> {
           'canceled': false,
           'message': 'El usuario no pudo ser encontrado.'
         };
-      } else if (user.whatsappNumber == null ||
+      }
+
+      if (user.whatsappNumber == null ||
           user.code == null ||
           user.location.value == null) {
         return {
           'canceled': false,
           'message': 'El usuario no cuenta con todas sus credenciales.'
+        };
+      }
+
+      if (appointment.dateTime == null) {
+        return {
+          'canceled': false,
+          'message': 'La cita no tiene una fecha y hora válida.'
         };
       }
 
@@ -302,7 +318,7 @@ class UserCubit extends Cubit<UserState> {
       return {
         'canceled': false,
         'message':
-            'Ocurrió un error al cancelar la cita\n Por favor intentelo de nuevo o verifique su conexicion a internet..'
+            'Ocurrió un error al cancelar la cita\n Por favor inténtelo de nuevo o verifique su conexión a internet.'
       };
     }
   }

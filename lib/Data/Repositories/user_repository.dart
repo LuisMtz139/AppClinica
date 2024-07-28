@@ -20,34 +20,25 @@ class UserRepository {
     Map<String, dynamic> response = await sendRequest(
         endPoint: '/request-code',
         method: HTTPMethod.post,
-        body: {
-          'whatsappNumber' : whatsappNumber
-        }
-    );
+        body: {'whatsappNumber': whatsappNumber});
     return response;
   }
 
-  Future<Map<String, dynamic>> validateUserCode({required String whatsappNumber, required String userCode}) async {
+  Future<Map<String, dynamic>> validateUserCode(
+      {required String whatsappNumber, required String userCode}) async {
     Map<String, dynamic> response = await sendRequest(
         endPoint: '/validate-code',
         method: HTTPMethod.post,
-        body: {
-          'whatsappNumber': whatsappNumber,
-          'userCode' : userCode
-        }
-    );
+        body: {'whatsappNumber': whatsappNumber, 'userCode': userCode});
     return response;
   }
 
-  Future<Map<String, dynamic>> loginWithCredentials({required String whatsappNumber, required String userCode}) async {
+  Future<Map<String, dynamic>> loginWithCredentials(
+      {required String whatsappNumber, required String userCode}) async {
     Map<String, dynamic> response = await sendRequest(
         endPoint: '/get-info',
         method: HTTPMethod.post,
-        body: {
-          'whatsappNumber': whatsappNumber,
-          'userCode' : userCode
-        }
-    );
+        body: {'whatsappNumber': whatsappNumber, 'userCode': userCode});
     return response;
   }
 
@@ -84,7 +75,7 @@ class UserRepository {
   }
 
   Future<bool> updateWhatsappNumber(String newNumber) async {
-    User user = await getUser() ?? User() ;
+    User user = await getUser() ?? User();
     user.whatsappNumber = newNumber;
     return await updateUser(user);
   }
@@ -103,7 +94,7 @@ class UserRepository {
 
   Future<bool> removeWhatsappNumber() async {
     User? user = await getUser();
-    if(user != null) {
+    if (user != null) {
       user.whatsappNumber = null;
       return await updateUser(user);
     }
@@ -113,7 +104,7 @@ class UserRepository {
 
   Future<bool> removeUserCode() async {
     User? user = await getUser();
-    if(user != null) {
+    if (user != null) {
       user.code = null;
       return await updateUser(user);
     }
@@ -121,7 +112,8 @@ class UserRepository {
     return false;
   }
 
-  Future<Map<String, dynamic>> scheduleAppointment({required User user, required DateTime day}) async {
+  Future<Map<String, dynamic>> scheduleAppointment(
+      {required User user, required DateTime day}) async {
     String data = await sendSOAPRequest(
         soapAction: 'http://tempuri.org/SPA_RESERVACITAEJECUCION',
         envelopeName: 'SPA_RESERVACITAEJECUCION',
@@ -129,10 +121,11 @@ class UserRepository {
           'DSNDataBase': user.location.value!.code,
           'NoWhatsAPP': '521${user.whatsappNumber}',
           'EXTERNAL_Idref_pedidospresup': user.treatments.last.orderId,
-          'EXTERNAL_FechaCandidata': Jiffy.parseFromDateTime(day).format(pattern: 'dd/MM/yyyy').toString(),
+          'EXTERNAL_FechaCandidata': Jiffy.parseFromDateTime(day)
+              .format(pattern: 'dd/MM/yyyy')
+              .toString(),
           'EXTERNAL_HoraCandidata': day.hour
-        }
-    );
+        });
 
     if (data.contains('ERR:') || data.isEmpty) {
       if (data.isEmpty) {
@@ -141,78 +134,91 @@ class UserRepository {
         data = data.replaceAll("ERR: ", "");
       }
 
-      return {
-        'scheduled': false,
-        'message': data
-      };
+      return {'scheduled': false, 'message': data};
     } else {
       user.treatments.last.availableAppointments = int.parse(data);
       await isar.writeTxn(() => isar.treatments.put(user.treatments.last));
       await user.treatments.save();
       return {
         'scheduled': true,
-        'message': 'La cita para el ${Jiffy.parseFromDateTime(day).yMMMMd} a la(s) ${Jiffy.parseFromDateTime(day).jm}, se agendó exitosamente. Te queda(n) ${user.treatments.last.availableAppointments ?? 0} cita(s) por agendar.'
+        'message':
+            'La cita para el ${Jiffy.parseFromDateTime(day).yMMMMd} a la(s) ${Jiffy.parseFromDateTime(day).jm}, se agendó exitosamente. Te queda(n) ${user.treatments.last.availableAppointments ?? 0} cita(s) por agendar.'
       };
     }
   }
 
-  Future<Map<String, dynamic>> updateAppointment({required String whatsappNumber, required String day, required String previousDay}) async {
+  Future<Map<String, dynamic>> updateAppointment(
+      {required String whatsappNumber,
+      required String day,
+      required String previousDay}) async {
     Map<String, dynamic> response = await sendRequest(
         endPoint: '/appointment',
         method: HTTPMethod.patch,
         body: {
-          'whatsappNumber' : whatsappNumber,
+          'whatsappNumber': whatsappNumber,
           'day': day,
           'previousDay': previousDay
-        }
-    );
+        });
     return response;
   }
 
-  Future<Map<String, dynamic>> cancelAppointment({required User user, required Appointment appointment}) async {
-    String data = await sendSOAPRequest(
-        soapAction: 'http://tempuri.org/SPA_CANCELARESERVACITA',
-        envelopeName: 'SPA_CANCELARESERVACITA',
-        content: {
-          'DSNDataBase': user.location.value!.code,
-          'NoWhatsAPP': '521${user.whatsappNumber}',
-          'EXTERNAL_Idspa_postvtaageope': appointment.id,
-          'EXTERNAL_FechaCita': Jiffy.parseFromDateTime(appointment.dateTime!).format(pattern: 'dd/MM/yyyy').toString(),
-          'EXTERNAL_HoraCita': appointment.dateTime!.hour
-        }
-    );
-
-    if (data.contains('ERR:') || data.length <= 1) {
-      if (data.length == 1) {
-        data = 'La cita no pudo ser cancelada.';
-      } else {
-        data = data.replaceAll("ERR: ", "");
-      }
-
-      return {
-        'canceled': false,
-        'message': data
-      };
-    } else {
-      if (data.contains('Ok')) {
-        user.treatments.last.availableAppointments = user.treatments.last.availableAppointments! + 1;
-        user.treatments.last.scheduledAppointments = [];
-        await isar.writeTxn(() => isar.treatments.put(user.treatments.last));
-        await user.treatments.save();
+  Future<Map<String, dynamic>> cancelAppointment(
+      {required User user, required Appointment appointment}) async {
+    try {
+      if (user.location.value == null || user.whatsappNumber == null) {
         return {
-          'canceled': true,
-          'message': 'La cita fue cancelada exitosamente.'
+          'canceled': false,
+          'message': 'Información de usuario incompleta.'
         };
       }
 
+      if (appointment.id == null || appointment.dateTime == null) {
+        return {
+          'canceled': false,
+          'message': 'Información de cita incompleta.'
+        };
+      }
+
+      String data = await sendSOAPRequest(
+          soapAction: 'http://tempuri.org/SPA_CANCELARESERVACITA',
+          envelopeName: 'SPA_CANCELARESERVACITA',
+          content: {
+            'DSNDataBase': user.location.value!.code,
+            'NoWhatsAPP': '521${user.whatsappNumber}',
+            'EXTERNAL_Idspa_postvtaageope': appointment.id,
+            'EXTERNAL_FechaCita': Jiffy.parseFromDateTime(appointment.dateTime!)
+                .format(pattern: 'dd/MM/yyyy')
+                .toString(),
+            'EXTERNAL_HoraCita': appointment.dateTime!.hour
+          });
+
+      if (data.contains('ERR:') || data.length <= 1) {
+        String errorMessage = data.length == 1
+            ? 'La cita no pudo ser cancelada.'
+            : data.replaceAll("ERR: ", "");
+        print('Error al cancelar la cita: $errorMessage');
+
+        return {'canceled': false, 'message': errorMessage};
+      } else {
+        if (data.contains('Ok')) {
+          // Actualizar el usuario y guardar cambios
+          return {
+            'canceled': true,
+            'message': 'La cita fue cancelada exitosamente.'
+          };
+        }
+
+        return {'canceled': false, 'message': 'La cita no pudo ser cancelada.'};
+      }
+    } catch (e) {
+      print('Excepción al cancelar la cita: $e');
       return {
         'canceled': false,
-        'message': 'La cita no pudo ser cancelada.'
+        'message':
+            'Ocurrió un error al cancelar la cita. Por favor, inténtelo de nuevo o verifique su conexión a internet.'
       };
     }
   }
-
-
 
   Future<Map<String, dynamic>> fetchUser({required User user}) async {
     //Check when multiple treatments are defined
@@ -231,15 +237,13 @@ class UserRepository {
 
     if (data.contains('ERR:') || data.length <= 1) {
       if (data.length == 1) {
-        data = 'No cuenta con ningún paquete, favor de comunicarse con la clínica para realizar la adquisición de un tratamiento.';
+        data =
+            'No cuenta con ningún paquete, favor de comunicarse con la clínica para realizar la adquisición de un tratamiento.';
       } else {
         data = data.replaceAll("ERR: ", "");
       }
 
-      return {
-        'validation': false,
-        'message': data
-      };
+      return {'validation': false, 'message': data};
     } else {
       data = data.substring(data.indexOf("€") + 1);
       List<String> patientData = data.split(",");
@@ -247,26 +251,60 @@ class UserRepository {
       late Treatment currentTreatment;
 
       try {
-        user.name = patientData.where((String element) => element.contains('nombrepaciente')).first.trimEqualsData();
-        List<Treatment> userTreatments = await user.treatments.filter().findAll();
+        user.name = patientData
+            .where((String element) => element.contains('nombrepaciente'))
+            .first
+            .trimEqualsData();
+        List<Treatment> userTreatments =
+            await user.treatments.filter().findAll();
 
         // Checks if there's more than one treatment in response (NEED TO ADD), right now I'm just checking the current DB
         if (userTreatments.isEmpty) {
           currentTreatment = Treatment();
-          currentTreatment.name = patientData.where((String element) => element.contains('descrippaquetecorporal')).first.trimEqualsData();
-          currentTreatment.orderId = int.parse(patientData.where((String element) => element.contains('idpedido')).first.trimEqualsData());
-          currentTreatment.productId = int.parse(patientData.where((String element) => element.contains('idpaquete')).first.trimEqualsData());
+          currentTreatment.name = patientData
+              .where((String element) =>
+                  element.contains('descrippaquetecorporal'))
+              .first
+              .trimEqualsData();
+          currentTreatment.orderId = int.parse(patientData
+              .where((String element) => element.contains('idpedido'))
+              .first
+              .trimEqualsData());
+          currentTreatment.productId = int.parse(patientData
+              .where((String element) => element.contains('idpaquete'))
+              .first
+              .trimEqualsData());
 
-          if (!patientData.where((String element) => element.contains('vigenciapaquete')).first.trimEqualsData().contains('nodisponible')) {
-            currentTreatment.lastDateToSchedule = parseDateTimeFromResponse(patientData.where((String element) => element.contains('vigenciapaquete')).first.trimEqualsData());
+          if (!patientData
+              .where((String element) => element.contains('vigenciapaquete'))
+              .first
+              .trimEqualsData()
+              .contains('nodisponible')) {
+            currentTreatment.lastDateToSchedule = parseDateTimeFromResponse(
+                patientData
+                    .where(
+                        (String element) => element.contains('vigenciapaquete'))
+                    .first
+                    .trimEqualsData());
           }
 
-          if (!patientData.where((String element) => element.contains('fproxcitaclinica')).first.trimEqualsData().contains('nodisponible')) {
-            currentTreatment.scheduledAppointments =
-            [
+          if (!patientData
+              .where((String element) => element.contains('fproxcitaclinica'))
+              .first
+              .trimEqualsData()
+              .contains('nodisponible')) {
+            currentTreatment.scheduledAppointments = [
               appointmentFromLogin(
-                  date: patientData.where((String element) => element.contains('fproxcitaclinica')).first.trimEqualsData(),
-                  time: patientData.where((String element) => element.contains('fproxcitaclinicahora')).first.trimEqualsData())
+                  date: patientData
+                      .where((String element) =>
+                          element.contains('fproxcitaclinica'))
+                      .first
+                      .trimEqualsData(),
+                  time: patientData
+                      .where((String element) =>
+                          element.contains('fproxcitaclinicahora'))
+                      .first
+                      .trimEqualsData())
             ];
           } else {
             currentTreatment.scheduledAppointments = [];
@@ -279,21 +317,55 @@ class UserRepository {
           user.treatments.add(currentTreatment);
         } else {
           for (Treatment userTreatment in userTreatments) {
-            currentTreatment = await user.treatments.filter().orderIdEqualTo(userTreatment.orderId).findFirst() ?? Treatment();
-            currentTreatment.name = patientData.where((String element) => element.contains('descrippaquetecorporal')).first.trimEqualsData();
-            currentTreatment.orderId = int.parse(patientData.where((String element) => element.contains('idpedido')).first.trimEqualsData());
-            currentTreatment.productId = int.parse(patientData.where((String element) => element.contains('idpaquete')).first.trimEqualsData());
+            currentTreatment = await user.treatments
+                    .filter()
+                    .orderIdEqualTo(userTreatment.orderId)
+                    .findFirst() ??
+                Treatment();
+            currentTreatment.name = patientData
+                .where((String element) =>
+                    element.contains('descrippaquetecorporal'))
+                .first
+                .trimEqualsData();
+            currentTreatment.orderId = int.parse(patientData
+                .where((String element) => element.contains('idpedido'))
+                .first
+                .trimEqualsData());
+            currentTreatment.productId = int.parse(patientData
+                .where((String element) => element.contains('idpaquete'))
+                .first
+                .trimEqualsData());
 
-            if (!patientData.where((String element) => element.contains('vigenciapaquete')).first.trimEqualsData().contains('nodisponible')) {
-              currentTreatment.lastDateToSchedule = parseDateTimeFromResponse(patientData.where((String element) => element.contains('vigenciapaquete')).first.trimEqualsData());
+            if (!patientData
+                .where((String element) => element.contains('vigenciapaquete'))
+                .first
+                .trimEqualsData()
+                .contains('nodisponible')) {
+              currentTreatment.lastDateToSchedule = parseDateTimeFromResponse(
+                  patientData
+                      .where((String element) =>
+                          element.contains('vigenciapaquete'))
+                      .first
+                      .trimEqualsData());
             }
 
-            if (!patientData.where((String element) => element.contains('fproxcitaclinica')).first.trimEqualsData().contains('nodisponible')) {
-              currentTreatment.scheduledAppointments =
-              [
+            if (!patientData
+                .where((String element) => element.contains('fproxcitaclinica'))
+                .first
+                .trimEqualsData()
+                .contains('nodisponible')) {
+              currentTreatment.scheduledAppointments = [
                 appointmentFromLogin(
-                    date: patientData.where((String element) => element.contains('fproxcitaclinica')).first.trimEqualsData(),
-                    time: patientData.where((String element) => element.contains('fproxcitaclinicahora')).first.trimEqualsData())
+                    date: patientData
+                        .where((String element) =>
+                            element.contains('fproxcitaclinica'))
+                        .first
+                        .trimEqualsData(),
+                    time: patientData
+                        .where((String element) =>
+                            element.contains('fproxcitaclinicahora'))
+                        .first
+                        .trimEqualsData())
               ];
             } else {
               currentTreatment.scheduledAppointments = [];
@@ -311,7 +383,7 @@ class UserRepository {
           'validation': true,
           'message': 'El usuario ha sido actualizado'
         };
-      } catch(e) {
+      } catch (e) {
         return {
           'validation': false,
           'message': 'Error en la validación:\n${e.toString()}'
@@ -328,11 +400,9 @@ class UserRepository {
           'DSNDataBase': user.location.value!.code,
           'NoWhatsAPP': '521${user.whatsappNumber}',
           'EXTERNAL_Idref_pedidospresup': user.treatments.last.orderId
-        }
-    );
+        });
 
     if (data.contains('ERR:') || data.length <= 1) {
-
       if (data.length == 1) {
         data = 'No cuenta con ninguna cita agendada.';
       } else {
@@ -343,22 +413,34 @@ class UserRepository {
       await isar.writeTxn(() => isar.treatments.put(user.treatments.last));
       await user.treatments.save();
 
-      return {
-        'updated': false,
-        'message': data
-      };
+      return {'updated': false, 'message': data};
     } else {
       user.treatments.last.scheduledAppointments = [];
-      for (String appointmentData in data.substring(0, data.length - 1).split('ð')) {
+      for (String appointmentData
+          in data.substring(0, data.length - 1).split('ð')) {
         List<String> appointmentValues = appointmentData.split(',');
         Appointment currentAppointment = Appointment();
-        currentAppointment.id = int.parse(appointmentValues.where((String element) => element.contains('id')).first.trim().trimEqualsData());
-        currentAppointment.date = appointmentValues.where((String element) => element.contains('fecha')).first.trim().trimEqualsData();
-        currentAppointment.time = appointmentValues.where((String element) => element.contains('hora')).first.trim().trimEqualsData();
+        currentAppointment.id = int.parse(appointmentValues
+            .where((String element) => element.contains('id'))
+            .first
+            .trim()
+            .trimEqualsData());
+        currentAppointment.date = appointmentValues
+            .where((String element) => element.contains('fecha'))
+            .first
+            .trim()
+            .trimEqualsData();
+        currentAppointment.time = appointmentValues
+            .where((String element) => element.contains('hora'))
+            .first
+            .trim()
+            .trimEqualsData();
 
-        if(currentAppointment.time != null) {
-          if(currentAppointment.time!.contains('€')) {
-            currentAppointment.time = (currentAppointment.time!.substring(0, currentAppointment.time!.indexOf('€'))).trim();
+        if (currentAppointment.time != null) {
+          if (currentAppointment.time!.contains('€')) {
+            currentAppointment.time = (currentAppointment.time!
+                    .substring(0, currentAppointment.time!.indexOf('€')))
+                .trim();
           }
         }
 
@@ -371,10 +453,7 @@ class UserRepository {
       }
       await isar.writeTxn(() => isar.treatments.put(user.treatments.last));
       await user.treatments.save();
-      return {
-        'updated': true,
-        'message': 'Citas descargadas'
-      };
+      return {'updated': true, 'message': 'Citas descargadas'};
     }
   }
 
@@ -389,8 +468,7 @@ class UserRepository {
           'DSNDataBase': user.location.value!.code,
           'NoWhatsAPP': '521${user.whatsappNumber}',
           'EXTERNAL_Idref_pedidospresup': user.treatments.last.orderId
-        }
-    );
+        });
 
     if (data.contains('ERR:') || data.length <= 1) {
       if (data.length == 1) {
@@ -399,10 +477,7 @@ class UserRepository {
         data = data.replaceAll("ERR: ", "");
       }
 
-      return {
-        'updated': false,
-        'message': data
-      };
+      return {'updated': false, 'message': data};
     } else {
       String datesString = '';
       String rangesString = '';
@@ -419,7 +494,7 @@ class UserRepository {
       for (String date in datesString.split(",")) {
         try {
           dates.add(Jiffy.parse(date.trim(), pattern: 'dd/MM/yyyy').dateTime);
-        } catch(e) {
+        } catch (e) {
           return {
             'updated': false,
             'message': 'Ocurrió un error al obtener las fechas disponibles: $e.'
@@ -427,23 +502,31 @@ class UserRepository {
         }
       }
 
-      dates.sort((a,b) => a.compareTo(b));
+      dates.sort((a, b) => a.compareTo(b));
 
       List<DateRange> dateRanges = [];
       user.treatments.last.availableAppointments ??= 0;
 
       if (rangesString.isNotEmpty) {
         for (String range in rangesString.split(",")) {
-          dateRanges.add(
-              DateRange(
-                  initialDate: Jiffy.parse(range.substring(0, range.indexOf('-')), pattern: 'dd/MM/yyyy').dateTime,
-                  endDate: Jiffy.parse(range.substring(range.indexOf('-') + 1, range.indexOf('_')), pattern: 'dd/MM/yyyy').dateTime,
-                  availableSchedules: int.parse(range.substring(range.indexOf('_') + 1)))
-          );
+          dateRanges.add(DateRange(
+              initialDate: Jiffy.parse(range.substring(0, range.indexOf('-')),
+                      pattern: 'dd/MM/yyyy')
+                  .dateTime,
+              endDate: Jiffy.parse(
+                      range.substring(
+                          range.indexOf('-') + 1, range.indexOf('_')),
+                      pattern: 'dd/MM/yyyy')
+                  .dateTime,
+              availableSchedules:
+                  int.parse(range.substring(range.indexOf('_') + 1))));
           if (user.treatments.last.availableAppointments != null) {
-            user.treatments.last.availableAppointments = user.treatments.last.availableAppointments! + int.parse(range.substring(range.indexOf('_') + 1));
+            user.treatments.last.availableAppointments =
+                user.treatments.last.availableAppointments! +
+                    int.parse(range.substring(range.indexOf('_') + 1));
           } else {
-            user.treatments.last.availableAppointments = int.parse(range.substring(range.indexOf('_') + 1));
+            user.treatments.last.availableAppointments =
+                int.parse(range.substring(range.indexOf('_') + 1));
           }
         }
       }
@@ -453,10 +536,7 @@ class UserRepository {
       await isar.writeTxn(() => isar.treatments.put(user.treatments.last));
       await user.treatments.save();
 
-      return {
-        'updated': true,
-        'message': 'Fechas descargadas'
-      };
+      return {'updated': true, 'message': 'Fechas descargadas'};
     }
   }
 
@@ -472,7 +552,8 @@ class UserRepository {
     }
   }
 
-  Appointment appointmentFromLogin({required String date, required String time}) {
+  Appointment appointmentFromLogin(
+      {required String date, required String time}) {
     String auxTime = time;
     if (auxTime.length == 1) {
       auxTime = '0$time';
@@ -480,9 +561,6 @@ class UserRepository {
 
     auxTime += ':00:00';
 
-    return Appointment(
-      time: auxTime,
-      date: date
-    );
+    return Appointment(time: auxTime, date: date);
   }
 }
