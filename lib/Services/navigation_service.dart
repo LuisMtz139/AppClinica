@@ -136,10 +136,6 @@ class NavigationService {
     String? email = prefs.getString('email');
     String? tel = prefs.getString('tel');
 
-    print('Valores del local storage:');
-    print('wp: $wp');
-    print('email: $email');
-    print('tel: $tel');
   }
 
   //imprimer a tel en tel de makecall
