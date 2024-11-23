@@ -50,9 +50,7 @@ class News extends StatelessWidget {
               }
 
               ValueNotifier<int> currentSlide = ValueNotifier(0);
-
              final carouselController = CarouselSliderLib.CarouselSliderController();
-
 
               return Column(
                 children: [
