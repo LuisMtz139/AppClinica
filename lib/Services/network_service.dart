@@ -111,19 +111,20 @@ Future<Map<String, dynamic>> sendRequest({required String endPoint, required HTT
 }
 
 
-const String soapIP = "144.126.130.95";
+const String soapIP = "lightcenterapp.ddns.net"; // DNS reemplazando la IP
+
 const String soapPort = "8091";
 const String soapServiceEndPoint = "WSGaliaLightCenterApp.asmx";
 
 Duration timeOutDuration = const Duration(seconds: 10);
 
 final Map<String, String> soapHeaders = {
-  'Host': '144.126.130.95',
+  'Host': soapIP,
   'Content-Type': 'text/xml; charset=utf-8'
 };
 
 final Map<String, String> soap2Headers = {
-  'Host': '144.126.130.95',
+  'Host': soapIP,
   'Content-Type': 'application/soap+xml; charset=utf-8'
 };
 

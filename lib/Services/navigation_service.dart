@@ -186,7 +186,7 @@ class NavigationService {
     return _navigationKey.currentState!.push(MaterialPageRoute(
         builder: (context) => PDFScreen(
             pdfName:
-                'http://144.126.130.95/ImgsRobotWhatsApp/LightCenterClinicas/Reglamento%20Interno.pdf',
+                'http://lightcenterapp.ddns.net/ImgsRobotWhatsApp/LightCenterClinicas/Reglamento%20Interno.pdf',
             isURL: true)));
   }
 
@@ -194,7 +194,7 @@ class NavigationService {
     return _navigationKey.currentState!.push(MaterialPageRoute(
         builder: (context) => PDFScreen(
             pdfName:
-                'http://144.126.130.95/ImgsRobotWhatsApp/LightCenterClinicas/Indicaciones%20para%20Sesiones.pdf',
+                'http://lightcenterapp.ddns.net/ImgsRobotWhatsApp/LightCenterClinicas/Indicaciones%20para%20Sesiones.pdf',
             isURL: true)));
   }
 
@@ -207,7 +207,7 @@ class NavigationService {
     return _navigationKey.currentState!.push(MaterialPageRoute(
         builder: (context) => PDFScreen(
             pdfName:
-                'http://144.126.130.95/ImgsRobotWhatsApp/LightCenterClinicas/Puntospremiumlightcenter.pdf',
+                'http://lightcenterapp.ddns.net/ImgsRobotWhatsApp/LightCenterClinicas/Puntospremiumlightcenter.pdf',
             isURL: true)));
   }
 

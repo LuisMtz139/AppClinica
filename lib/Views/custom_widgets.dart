@@ -491,7 +491,7 @@ Drawer commonDrawer() {
                 title: 'Aviso de Privacidad',
                 action: () => NavigationService.openOnlinePDF(
                     url:
-                        'http://144.126.130.95/ImgsRobotWhatsApp/LightCenterClinicas/Avisodeprivacidad.pdf')),
+                        'http://lightcenterapp.ddns.net/ImgsRobotWhatsApp/LightCenterClinicas/Avisodeprivacidad.pdf')),
           ],
         ),
         Column(
