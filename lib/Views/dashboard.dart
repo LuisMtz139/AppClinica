@@ -25,6 +25,7 @@ Future<String> consultarMonederoElectronico(String whatsappNumber) async {
   </soap:Body>
 </soap:Envelope>
 ''';
+    print(soapEnvelope);
 
     final response = await http.post(
       Uri.parse('http://144.126.130.95:8091/WSGaliaLightCenterApp.asmx'),
@@ -34,6 +35,7 @@ Future<String> consultarMonederoElectronico(String whatsappNumber) async {
       },
       body: soapEnvelope,
     );
+    print(response.body);
 
     if (response.statusCode == 200) {
       final document = xml.XmlDocument.parse(response.body);
@@ -196,38 +198,74 @@ class _MonederoElectronicoPageState extends State<MonederoElectronicoPage> {
                       ),
                       const SizedBox(height: 8),
                       Expanded(
-                        child: data['historial'] != null
-                            ? ListView.builder(
-                                itemCount: data['historial'].length,
-                                itemBuilder: (context, index) {
-                                  final transaccion = data['historial'][index];
-                                  return Card(
-                                    margin:
-                                        const EdgeInsets.symmetric(vertical: 4),
-                                    child: ListTile(
-                                      leading: Icon(
-                                        transaccion['tipo'] == 'ingreso'
-                                            ? Icons.arrow_downward
-                                            : Icons.arrow_upward,
-                                        color: transaccion['tipo'] == 'ingreso'
-                                            ? Colors.green
-                                            : Colors.red,
+                        child: data['historial'] != null &&
+                                data['historial'].isNotEmpty
+                            ? SingleChildScrollView(
+                                scrollDirection: Axis.vertical,
+                                child: SingleChildScrollView(
+                                  scrollDirection: Axis.horizontal,
+                                  child: DataTable(
+                                    columns: const [
+                                      DataColumn(
+                                        label: Text('Fecha',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
                                       ),
-                                      title: Text(transaccion['concepto']),
-                                      subtitle: Text(transaccion['fecha']),
-                                      trailing: Text(
-                                        '${transaccion['monto']} MXN',
-                                        style: TextStyle(
-                                          color:
-                                              transaccion['tipo'] == 'ingreso'
-                                                  ? Colors.green
-                                                  : Colors.red,
-                                          fontWeight: FontWeight.bold,
-                                        ),
+                                      DataColumn(
+                                        label: Text('Detalle',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
                                       ),
-                                    ),
-                                  );
-                                },
+                                      DataColumn(
+                                        label: Text('Cargo',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                      DataColumn(
+                                        label: Text('Abono',
+                                            style: TextStyle(
+                                                fontWeight: FontWeight.bold)),
+                                      ),
+                                    ],
+                                    rows: data['historial']
+                                        .map<DataRow>((transaccion) {
+                                      final esIngreso =
+                                          transaccion['tipo'] == 'ingreso';
+                                      return DataRow(
+                                        cells: [
+                                          DataCell(
+                                              Text(transaccion['fecha'] ?? '')),
+                                          DataCell(Text(
+                                              transaccion['concepto'] ?? '')),
+                                          DataCell(
+                                            esIngreso
+                                                ? const Text('')
+                                                : Text(
+                                                    '${transaccion['monto']} MXN',
+                                                    style: const TextStyle(
+                                                      color: Colors.red,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  ),
+                                          ),
+                                          DataCell(
+                                            esIngreso
+                                                ? Text(
+                                                    '${transaccion['monto']} MXN',
+                                                    style: const TextStyle(
+                                                      color: Colors.green,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                    ),
+                                                  )
+                                                : const Text(''),
+                                          ),
+                                        ],
+                                      );
+                                    }).toList(),
+                                  ),
+                                ),
                               )
                             : Center(
                                 child: Column(
@@ -251,46 +289,119 @@ class _MonederoElectronicoPageState extends State<MonederoElectronicoPage> {
                   ),
                 );
               } catch (e) {
-                return Center(
-                  child: Padding(
-                    padding: const EdgeInsets.all(16.0),
-                    child: Card(
-                      elevation: 4,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15),
-                        side: BorderSide(
-                          color: monederoColor,
-                          width: 2,
+                // Aquí el bloque modificado para mostrar la tabla en vez de solo texto
+                return Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Card(
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          side: BorderSide(
+                            color: monederoColor,
+                            width: 2,
+                          ),
                         ),
-                      ),
-                      child: Padding(
-                        padding: const EdgeInsets.all(20.0),
-                        child: Column(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.account_balance_wallet,
-                              color: monederoColor,
-                              size: 48,
-                            ),
-                            const SizedBox(height: 16),
-                            const Text(
-                              'Información del monedero:',
-                              style: TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.account_balance_wallet,
+                                    color: monederoColor,
+                                    size: 32,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text(
+                                    'Saldo Disponible',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
                               ),
-                            ),
-                            const SizedBox(height: 16),
-                            Text(
-                              snapshot.data ?? 'No se encontró información',
-                              style: const TextStyle(fontSize: 16),
-                              textAlign: TextAlign.center,
-                            ),
-                          ],
+                              const SizedBox(height: 16),
+                              Center(
+                                child: Text(
+                                  'No disponible',
+                                  style: TextStyle(
+                                    fontSize: 32,
+                                    fontWeight: FontWeight.bold,
+                                    color: monederoColor,
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
-                    ),
+                      const SizedBox(height: 20),
+                      Row(
+                        children: [
+                          Icon(
+                            Icons.history,
+                            color: monederoColor,
+                          ),
+                          const SizedBox(width: 8),
+                          const Text(
+                            'Historial de Transacciones',
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+                      Expanded(
+                        child: SingleChildScrollView(
+                          scrollDirection: Axis.vertical,
+                          child: SingleChildScrollView(
+                            scrollDirection: Axis.horizontal,
+                            child: DataTable(
+                              columns: const [
+                                DataColumn(
+                                  label: Text('Fecha',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                ),
+                                DataColumn(
+                                  label: Text('Detalle',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                ),
+                                DataColumn(
+                                  label: Text('Cargo',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                ),
+                                DataColumn(
+                                  label: Text('Abono',
+                                      style: TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                ),
+                              ],
+                              rows: [
+                                DataRow(
+                                  cells: [
+                                    DataCell(Text('No se encontró información',
+                                        style: TextStyle(color: Colors.grey))),
+                                    const DataCell(Text('')),
+                                    const DataCell(Text('')),
+                                    const DataCell(Text('')),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
                 );
               }
@@ -501,24 +612,6 @@ class Dashboard extends StatelessWidget {
                                 colorFilter: ColorFilter.mode(
                                   Color.fromRGBO(195, 167, 226, 0.7),
                                   BlendMode.overlay,
-                                ),
-                              ),
-                            ),
-                            child: const Center(
-                              child: Text(
-                                "Monedero Electrónico",
-                                textAlign: TextAlign.center,
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  fontSize: 18,
-                                  color: Color.fromARGB(255, 0, 0, 0),
-                                  shadows: [
-                                    Shadow(
-                                      blurRadius: 4,
-                                      color: Colors.white70,
-                                      offset: Offset(1, 1),
-                                    )
-                                  ],
                                 ),
                               ),
                             ),
