@@ -87,7 +87,7 @@ class Schedule extends StatelessWidget {
                     ),
                     Visibility(
                       visible:
-                      state.user.treatments.last.dateRanges!.isNotEmpty,
+                          state.user.treatments.last.dateRanges!.isNotEmpty,
                       child: SizedBox(
                         height: MediaQuery.of(context).size.height * 0.1,
                         child: Scrollbar(
@@ -99,11 +99,12 @@ class Schedule extends StatelessWidget {
                             physics: const ClampingScrollPhysics(),
                             shrinkWrap: true,
                             itemCount:
-                            state.user.treatments.last.dateRanges!.length,
+                                state.user.treatments.last.dateRanges!.length,
                             itemBuilder: (context, index) {
                               late Color rangeColor;
                               if (index % 2 == 0) {
-                                rangeColor = LightCenterColors.backgroundPurple;
+                                rangeColor =
+                                    LightCenterColors.backgroundPurple;
                               } else {
                                 rangeColor = LightCenterColors.backgroundPink;
                               }
@@ -138,8 +139,8 @@ class Schedule extends StatelessWidget {
                             },
                             eventLoader: (date) {
                               return eventsList
-                                  .where((event) =>
-                                  DateUtils.isSameDay(event.dateTime, date))
+                                  .where((event) => DateUtils.isSameDay(
+                                      event.dateTime, date))
                                   .toList();
                             },
                             selectedDayPredicate: (day) {
@@ -149,16 +150,36 @@ class Schedule extends StatelessWidget {
                               selectedDay.value = newSelectedDay;
                               focusedDay.value = newFocusedDay;
                               getDaySchedule(
-                                  day: selectedDay.value!, user: state.user)
-                                  .then((daySchedule) {
-                                if (daySchedule
-                                    .where((element) =>
-                                    element.toLowerCase().contains('error'))
-                                    .toList()
-                                    .isNotEmpty) {
-                                  NavigationService.showSnackBar(
-                                      message:
-                                      'Ocurrió un error al cargar los horarios.');
+                                day: selectedDay.value!,
+                                user: state.user,
+                              ).then((daySchedule) {
+                                // Print para depuración
+                                print('Día seleccionado: $newSelectedDay');
+                                print('Horas recibidas para el día: $daySchedule');
+                                // Filtra los elementos que son horas en formato HH:mm
+                                final horasDisponibles = daySchedule.where((element) {
+                                  return element is String &&
+                                      RegExp(r'^\d{1,2}:\d{2}$').hasMatch(element);
+                                }).toList();
+
+                                if (horasDisponibles.isEmpty) {
+                                  showDialog(
+                                    context: context,
+                                    builder: (context) => AlertDialog(
+                                      title: const Text('Sin horarios disponibles'),
+                                      content: const Text('Cambió la disponibilidad y no hay horarios.'),
+                                      actions: [
+                                        TextButton(
+                                          onPressed: () {
+                                            Navigator.of(context).pop();
+                                            // Refresca las fechas disponibles al cerrar el modal
+                                            BlocProvider.of<UserCubit>(context).getAvailableDatesBySOAP();
+                                          },
+                                          child: const Text('Aceptar'),
+                                        ),
+                                      ],
+                                    ),
+                                  );
                                 } else {
                                   showModal(
                                     events: getEventsForDay(),
@@ -182,7 +203,8 @@ class Schedule extends StatelessWidget {
                                 shape: BoxShape.circle,
                               ),
                               todayDecoration: BoxDecoration(
-                                color: LightCenterColors.backgroundPurple,
+                                color:
+                                    LightCenterColors.backgroundPurple,
                                 shape: BoxShape.circle,
                               ),
                             ),
@@ -194,13 +216,14 @@ class Schedule extends StatelessWidget {
                                     margin: const EdgeInsets.all(4.0),
                                     alignment: Alignment.center,
                                     decoration: const BoxDecoration(
-                                      color: Color.fromARGB(255, 224, 91, 228),
+                                      color:
+                                          Color.fromARGB(255, 224, 91, 228),
                                       shape: BoxShape.circle,
                                     ),
                                     child: Text(
                                       '${day.day}',
-                                      style:
-                                      const TextStyle(color: Colors.white),
+                                      style: const TextStyle(
+                                          color: Colors.white),
                                     ),
                                   );
                                 }
@@ -223,7 +246,7 @@ class Schedule extends StatelessWidget {
         currentScreen = errorScreen(
           context: context,
           errorMessage:
-          'Error al cargar citas.\n\nEstamos trabajando para solucionarlo. Por favor, intenta de nuevo en unos momentos o verifique su conexcion a internet.',
+              'Error al cargar citas.\n\nEstamos trabajando para solucionarlo. Por favor, intenta de nuevo en unos momentos o verifique su conexcion a internet.',
         );
         Future.delayed(const Duration(seconds: 5), () {
           userCubit.getAvailableDatesBySOAP();

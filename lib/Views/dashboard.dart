@@ -13,7 +13,6 @@ import 'package:xml/xml.dart' as xml;
 // Función para consumir el servicio web SOAP de monedero electrónico
 Future<String> consultarMonederoElectronico(String whatsappNumber) async {
   try {
-    // Creamos el envelope SOAP
     String soapEnvelope = '''
 <?xml version="1.0" encoding="utf-8"?>
 <soap:Envelope xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:xsd="http://www.w3.org/2001/XMLSchema" xmlns:soap="http://schemas.xmlsoap.org/soap/envelope/">
@@ -27,7 +26,6 @@ Future<String> consultarMonederoElectronico(String whatsappNumber) async {
 </soap:Envelope>
 ''';
 
-    // Realizamos la llamada al web service
     final response = await http.post(
       Uri.parse('http://144.126.130.95:8091/WSGaliaLightCenterApp.asmx'),
       headers: {
@@ -38,9 +36,9 @@ Future<String> consultarMonederoElectronico(String whatsappNumber) async {
     );
 
     if (response.statusCode == 200) {
-      // Parseamos la respuesta XML
       final document = xml.XmlDocument.parse(response.body);
-      final result = document.findAllElements('SPA_MONEDEROELECTRONICOResult').first.text;
+      final result =
+          document.findAllElements('SPA_MONEDEROELECTRONICOResult').first.text;
       return result;
     } else {
       throw Exception('Error al consultar el monedero: ${response.statusCode}');
@@ -50,14 +48,14 @@ Future<String> consultarMonederoElectronico(String whatsappNumber) async {
   }
 }
 
-// Página para mostrar la información del monedero electrónico
 class MonederoElectronicoPage extends StatefulWidget {
   final String whatsappNumber;
 
   const MonederoElectronicoPage({super.key, required this.whatsappNumber});
 
   @override
-  _MonederoElectronicoPageState createState() => _MonederoElectronicoPageState();
+  _MonederoElectronicoPageState createState() =>
+      _MonederoElectronicoPageState();
 }
 
 class _MonederoElectronicoPageState extends State<MonederoElectronicoPage> {
@@ -79,7 +77,6 @@ class _MonederoElectronicoPageState extends State<MonederoElectronicoPage> {
       ),
       body: Container(
         decoration: BoxDecoration(
-          // Aplicamos un gradiente sutil con el color base
           gradient: LinearGradient(
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
@@ -103,7 +100,8 @@ class _MonederoElectronicoPageState extends State<MonederoElectronicoPage> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    const Icon(Icons.error_outline, size: 60, color: Colors.red),
+                    const Icon(Icons.error_outline,
+                        size: 60, color: Colors.red),
                     const SizedBox(height: 16),
                     Text(
                       'Error al cargar el monedero: ${snapshot.error}',
@@ -117,7 +115,8 @@ class _MonederoElectronicoPageState extends State<MonederoElectronicoPage> {
                       ),
                       onPressed: () {
                         setState(() {
-                          monederoFuture = consultarMonederoElectronico(widget.whatsappNumber);
+                          monederoFuture = consultarMonederoElectronico(
+                              widget.whatsappNumber);
                         });
                       },
                       child: const Text('Reintentar'),
@@ -126,8 +125,6 @@ class _MonederoElectronicoPageState extends State<MonederoElectronicoPage> {
                 ),
               );
             } else if (snapshot.hasData) {
-              // Suponiendo que la respuesta es un JSON string
-              // Podrías adaptarlo según el formato real de la respuesta
               try {
                 final data = json.decode(snapshot.data!);
                 return Padding(
@@ -198,7 +195,6 @@ class _MonederoElectronicoPageState extends State<MonederoElectronicoPage> {
                         ],
                       ),
                       const SizedBox(height: 8),
-                      // Aquí podrías mostrar un historial si está disponible en la respuesta
                       Expanded(
                         child: data['historial'] != null
                             ? ListView.builder(
@@ -206,7 +202,8 @@ class _MonederoElectronicoPageState extends State<MonederoElectronicoPage> {
                                 itemBuilder: (context, index) {
                                   final transaccion = data['historial'][index];
                                   return Card(
-                                    margin: const EdgeInsets.symmetric(vertical: 4),
+                                    margin:
+                                        const EdgeInsets.symmetric(vertical: 4),
                                     child: ListTile(
                                       leading: Icon(
                                         transaccion['tipo'] == 'ingreso'
@@ -221,9 +218,10 @@ class _MonederoElectronicoPageState extends State<MonederoElectronicoPage> {
                                       trailing: Text(
                                         '${transaccion['monto']} MXN',
                                         style: TextStyle(
-                                          color: transaccion['tipo'] == 'ingreso'
-                                              ? Colors.green
-                                              : Colors.red,
+                                          color:
+                                              transaccion['tipo'] == 'ingreso'
+                                                  ? Colors.green
+                                                  : Colors.red,
                                           fontWeight: FontWeight.bold,
                                         ),
                                       ),
@@ -253,7 +251,6 @@ class _MonederoElectronicoPageState extends State<MonederoElectronicoPage> {
                   ),
                 );
               } catch (e) {
-                // Si la respuesta no es un JSON válido o tiene otro formato
                 return Center(
                   child: Padding(
                     padding: const EdgeInsets.all(16.0),
@@ -319,7 +316,8 @@ class _MonederoElectronicoPageState extends State<MonederoElectronicoPage> {
                       ),
                       onPressed: () {
                         setState(() {
-                          monederoFuture = consultarMonederoElectronico(widget.whatsappNumber);
+                          monederoFuture = consultarMonederoElectronico(
+                              widget.whatsappNumber);
                         });
                       },
                       child: const Text('Reintentar'),
@@ -365,8 +363,10 @@ class Dashboard extends StatelessWidget {
               children: [
                 Visibility(
                     visible: state.user.treatments.isNotEmpty &&
-                        state.user.treatments.last.scheduledAppointments != null &&
-                        state.user.treatments.last.scheduledAppointments!.isNotEmpty,
+                        state.user.treatments.last.scheduledAppointments !=
+                            null &&
+                        state.user.treatments.last.scheduledAppointments!
+                            .isNotEmpty,
                     child: Container(
                         decoration: BoxDecoration(
                           color: LightCenterColors.mainPurple.withOpacity(0.9),
@@ -479,6 +479,52 @@ class Dashboard extends StatelessWidget {
                           ),
                         ),
                       ),
+                      // MONEDERO: texto centrado sobre imagen de fondo
+                      GestureDetector(
+                        onTap: () => Navigator.of(context).push(
+                          MaterialPageRoute(
+                            builder: (context) => MonederoElectronicoPage(
+                              whatsappNumber: state.user.whatsappNumber!,
+                            ),
+                          ),
+                        ),
+                        child: Card(
+                          color: const Color.fromRGBO(195, 167, 226, 1),
+                          child: Container(
+                            width: MediaQuery.of(context).size.width * 0.50,
+                            height: MediaQuery.of(context).size.height * 0.07,
+                            decoration: const BoxDecoration(
+                              image: DecorationImage(
+                                image:
+                                    AssetImage("assets/images/monedero-1.png"),
+                                fit: BoxFit.cover,
+                                colorFilter: ColorFilter.mode(
+                                  Color.fromRGBO(195, 167, 226, 0.7),
+                                  BlendMode.overlay,
+                                ),
+                              ),
+                            ),
+                            child: const Center(
+                              child: Text(
+                                "Monedero Electrónico",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  fontWeight: FontWeight.bold,
+                                  fontSize: 18,
+                                  color: Color.fromARGB(255, 0, 0, 0),
+                                  shadows: [
+                                    Shadow(
+                                      blurRadius: 4,
+                                      color: Colors.white70,
+                                      offset: Offset(1, 1),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+                      ),
                       GestureDetector(
                         onTap: () => NavigationService.openLoyalty(),
                         child: Card(
@@ -492,54 +538,6 @@ class Dashboard extends StatelessWidget {
                                     image: AssetImage(
                                         "assets/images/programa_lealtad.jpg"),
                                     fit: BoxFit.fill)),
-                          ),
-                        ),
-                      ),
-                      // Nuevo apartado: Monedero con consumo del servicio web SOAP
-                      GestureDetector(
-                        onTap: () => Navigator.of(context).push(
-                            MaterialPageRoute(
-                                builder: (context) => MonederoElectronicoPage(
-                                    whatsappNumber: state.user.whatsappNumber!))),
-                        child: Card(
-                          color: const Color.fromRGBO(195, 167, 226, 1),
-                          child: Stack(
-                            children: [
-                              Container(
-                                width: MediaQuery.of(context).size.width * 0.4,
-                                height: MediaQuery.of(context).size.height * 0.15,
-                                decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.circular(35.0),
-                                    image: const DecorationImage(
-                                        image: AssetImage(
-                                            "assets/images/programa_lealtad.jpg"), // Cambiar por la imagen del monedero cuando esté disponible
-                                        fit: BoxFit.fill,
-                                        colorFilter: ColorFilter.mode(
-                                          Color.fromRGBO(195, 167, 226, 0.7),
-                                          BlendMode.overlay,
-                                        ))),
-                              ),
-                              Center(
-                                child: Container(
-                                  padding: const EdgeInsets.symmetric(
-                                    horizontal: 10,
-                                    vertical: 5,
-                                  ),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.5),
-                                    borderRadius: BorderRadius.circular(10),
-                                  ),
-                                  child: const Text(
-                                    "Mi Monedero",
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ],
                           ),
                         ),
                       ),

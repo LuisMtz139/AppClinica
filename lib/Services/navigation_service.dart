@@ -159,7 +159,7 @@ class NavigationService {
     String? wp = prefs.getString('wp');
     String countryCode = "52"; // Reemplaza esto con tu código de país
     String messge =
-        'Hola, me gustaría recibir información sobre los tratamientos que ofrecen.';
+        'Hola, ya soy paciente de Light Center, deseo ser atendido por una consultora.';
 
     // Check if wp is not null
     if (wp != null) {
