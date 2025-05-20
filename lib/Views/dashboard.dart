@@ -10,6 +10,77 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:xml/xml.dart' as xml;
 
+Map<String, dynamic> parseMonederoResult(String result) {
+  final Map<String, dynamic> data = {};
+  if (result == null || result.trim().isEmpty) {
+    data['saldo'] = null;
+    data['historial'] = [];
+    return data;
+  }
+  String saldoRaw;
+  String resto;
+  if (result.contains('_')) {
+    final parts = result.split('_');
+    saldoRaw = parts[0];
+    resto = parts.sublist(1).join('_');
+  } else {
+    saldoRaw = '';
+    resto = result;
+  }
+  double? saldo;
+  if (saldoRaw.contains(':')) {
+    final saldoStr = saldoRaw.split(':').last;
+    saldo = double.tryParse(saldoStr);
+  }
+  data['saldo'] = saldo?.toStringAsFixed(2) ?? 'No disponible';
+
+  final List<Map<String, dynamic>> historial = [];
+  final transacciones = resto.split('-');
+
+  for (final t in transacciones) {
+    if (t.trim().isEmpty) continue;
+    final fechaReg = RegExp(r'(\d{2}/\d{2}/\d{4})');
+    final matchFecha = fechaReg.firstMatch(t);
+    String? fecha = matchFecha?.group(1);
+
+    String afterFecha = fecha != null
+        ? t.substring(t.indexOf(fecha) + fecha.length).trim()
+        : t.trim();
+
+    // Extraer solo el detalle entre la fecha y la palabra "Precio"
+    String detalle = '';
+    final precioIndex = afterFecha.indexOf('Precio');
+    if (precioIndex > 0) {
+      detalle = afterFecha.substring(0, precioIndex).trim();
+    } else {
+      // Por si no trae "Precio", usa todo lo que hay antes del monto
+      final montoReg = RegExp(r'\?([\d.]+)€([AC])');
+      final matchMonto = montoReg.firstMatch(afterFecha);
+      detalle = matchMonto != null
+          ? afterFecha.substring(0, matchMonto.start).trim()
+          : afterFecha.trim();
+    }
+
+    final montoReg = RegExp(r'\?([\d.]+)€([AC])');
+    final matchMonto = montoReg.firstMatch(afterFecha);
+    double? monto;
+    String? tipo;
+    if (matchMonto != null) {
+      monto = double.tryParse(matchMonto.group(1)!);
+      tipo = matchMonto.group(2) == 'A' ? 'ingreso' : 'egreso';
+    }
+
+    historial.add({
+      'fecha': fecha ?? '',
+      'concepto': detalle,
+      'monto': monto?.toStringAsFixed(2) ?? '',
+      'tipo': tipo ?? '',
+    });
+  }
+  data['historial'] = historial;
+  return data;
+}
+
 // Función para consumir el servicio web SOAP de monedero electrónico
 Future<String> consultarMonederoElectronico(String whatsappNumber) async {
   try {
@@ -41,7 +112,8 @@ Future<String> consultarMonederoElectronico(String whatsappNumber) async {
       final document = xml.XmlDocument.parse(response.body);
       final result =
           document.findAllElements('SPA_MONEDEROELECTRONICOResult').first.text;
-      return result;
+      // <-- Aquí se agrega el parser y el encode a json:
+      return json.encode(parseMonederoResult(result));
     } else {
       throw Exception('Error al consultar el monedero: ${response.statusCode}');
     }
@@ -133,53 +205,6 @@ class _MonederoElectronicoPageState extends State<MonederoElectronicoPage> {
                   padding: const EdgeInsets.all(16.0),
                   child: Column(
                     children: [
-                      Card(
-                        elevation: 4,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(15),
-                          side: BorderSide(
-                            color: monederoColor,
-                            width: 2,
-                          ),
-                        ),
-                        child: Padding(
-                          padding: const EdgeInsets.all(16.0),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                children: [
-                                  Icon(
-                                    Icons.account_balance_wallet,
-                                    color: monederoColor,
-                                    size: 32,
-                                  ),
-                                  const SizedBox(width: 8),
-                                  const Text(
-                                    'Saldo Disponible',
-                                    style: TextStyle(
-                                      fontSize: 18,
-                                      fontWeight: FontWeight.bold,
-                                    ),
-                                  ),
-                                ],
-                              ),
-                              const SizedBox(height: 16),
-                              Center(
-                                child: Text(
-                                  '${data['saldo'] ?? 'No disponible'} MXN',
-                                  style: TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold,
-                                    color: monederoColor,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                      const SizedBox(height: 20),
                       Row(
                         children: [
                           Icon(
@@ -285,6 +310,66 @@ class _MonederoElectronicoPageState extends State<MonederoElectronicoPage> {
                                 ),
                               ),
                       ),
+                      Card(
+                        elevation: 4,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(15),
+                          side: BorderSide(
+                            color: monederoColor,
+                            width: 2,
+                          ),
+                        ),
+                        child: Padding(
+                          padding: const EdgeInsets.all(16.0),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Row(
+                                children: [
+                                  Icon(
+                                    Icons.account_balance_wallet,
+                                    color: monederoColor,
+                                    size: 32,
+                                  ),
+                                  const SizedBox(width: 8),
+                                  const Text(
+                                    'Saldo Disponible',
+                                    style: TextStyle(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                              const SizedBox(height: 16),
+                              Center(
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      '${data['saldo'] ?? 'No disponible'} MXN',
+                                      style: TextStyle(
+                                        fontSize: 32,
+                                        fontWeight: FontWeight.bold,
+                                        color: monederoColor,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      'Saldo disponible',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.black54,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      const SizedBox(height: 20)
                     ],
                   ),
                 );
@@ -327,13 +412,26 @@ class _MonederoElectronicoPageState extends State<MonederoElectronicoPage> {
                               ),
                               const SizedBox(height: 16),
                               Center(
-                                child: Text(
-                                  'No disponible',
-                                  style: TextStyle(
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.bold,
-                                    color: monederoColor,
-                                  ),
+                                child: Column(
+                                  children: [
+                                    Text(
+                                      'No disponible',
+                                      style: TextStyle(
+                                        fontSize: 32,
+                                        fontWeight: FontWeight.bold,
+                                        color: monederoColor,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 6),
+                                    Text(
+                                      'Saldo disponible',
+                                      style: TextStyle(
+                                        fontSize: 15,
+                                        color: Colors.black54,
+                                        fontWeight: FontWeight.normal,
+                                      ),
+                                    ),
+                                  ],
                                 ),
                               ),
                             ],
