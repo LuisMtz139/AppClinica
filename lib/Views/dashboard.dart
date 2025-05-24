@@ -47,20 +47,14 @@ Map<String, dynamic> parseMonederoResult(String result) {
         ? t.substring(t.indexOf(fecha) + fecha.length).trim()
         : t.trim();
 
-    // Extraer solo el detalle entre la fecha y la palabra "Precio"
+    // Extraer el detalle entre la fecha y el primer signo de interrogación (?), sin incluir el ?
     String detalle = '';
-    final precioIndex = afterFecha.indexOf('Precio');
-    if (precioIndex > 0) {
-      detalle = afterFecha.substring(0, precioIndex).trim();
+    final signoInterrogacionIndex = afterFecha.indexOf('?');
+    if (signoInterrogacionIndex > 0) {
+      detalle = afterFecha.substring(0, signoInterrogacionIndex).trim();
     } else {
-      // Por si no trae "Precio", usa todo lo que hay antes del monto
-      final montoReg = RegExp(r'\?([\d.]+)€([AC])');
-      final matchMonto = montoReg.firstMatch(afterFecha);
-      detalle = matchMonto != null
-          ? afterFecha.substring(0, matchMonto.start).trim()
-          : afterFecha.trim();
+      detalle = afterFecha.trim();
     }
-
     final montoReg = RegExp(r'\?([\d.]+)€([AC])');
     final matchMonto = montoReg.firstMatch(afterFecha);
     double? monto;
@@ -346,7 +340,7 @@ class _MonederoElectronicoPageState extends State<MonederoElectronicoPage> {
                                 child: Column(
                                   children: [
                                     Text(
-                                      '${data['saldo'] ?? 'No disponible'} MXN',
+                                      '${data['saldo'] ?? '0.0'} MXN',
                                       style: TextStyle(
                                         fontSize: 32,
                                         fontWeight: FontWeight.bold,
@@ -415,7 +409,7 @@ class _MonederoElectronicoPageState extends State<MonederoElectronicoPage> {
                                 child: Column(
                                   children: [
                                     Text(
-                                      'No disponible',
+                                      '0.0',
                                       style: TextStyle(
                                         fontSize: 32,
                                         fontWeight: FontWeight.bold,
@@ -700,17 +694,15 @@ class Dashboard extends StatelessWidget {
                         child: Card(
                           color: const Color.fromRGBO(195, 167, 226, 1),
                           child: Container(
-                            width: MediaQuery.of(context).size.width * 0.50,
-                            height: MediaQuery.of(context).size.height * 0.07,
-                            decoration: const BoxDecoration(
-                              image: DecorationImage(
-                                image:
-                                    AssetImage("assets/images/monedero-1.png"),
-                                fit: BoxFit.cover,
-                                colorFilter: ColorFilter.mode(
-                                  Color.fromRGBO(195, 167, 226, 0.7),
-                                  BlendMode.overlay,
-                                ),
+                            width: MediaQuery.of(context).size.width * 0.4,
+                            height: MediaQuery.of(context).size.height * 0.14,
+                            decoration: BoxDecoration(
+                              // borderRadius: BorderRadius.circular(0.0),
+                              image: const DecorationImage(
+                                image: AssetImage(
+                                    "assets/images/monedero elect.png"),
+                                fit: BoxFit
+                                    .fill, // <= Igual que los otros botones
                               ),
                             ),
                           ),
