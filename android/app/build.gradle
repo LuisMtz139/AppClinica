@@ -26,7 +26,7 @@ if (keystorePropertiesFile.exists()) {
 
 android {
     namespace "kranzwide.lightcenter.lightcenter"
-    compileSdkVersion 33
+    compileSdkVersion 34
     ndkVersion "25.1.8937393"
 
     compileOptions {
@@ -45,36 +45,27 @@ android {
     defaultConfig {
         applicationId "kranzwide.lightcenter.lightcenter"
         minSdkVersion 21
-        targetSdkVersion 33
+        targetSdkVersion 34
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
     }
 
-    signingConfigs {
-        release {
-            keyAlias 'key'
-            keyPassword '@Kwc602alfa1000@'
-            storeFile file('/home/alejandro/key.jks')
-            storePassword '@Kwc602alfa1000@'
-        }
-    }
-
-    // buildTypes {
-    //     release {
-    //         signingConfig signingConfigs.release
-    //         minifyEnabled false
-    //         shrinkResources false
-    //     }
-    // }
-
-    buildTypes {
+signingConfigs {
     release {
-        // signingConfig signingConfigs.release // <--- comenta o elimina esta línea
-        minifyEnabled false
-        shrinkResources false
+        keyAlias 'key'
+        keyPassword '@Kwc602alfa1000@'
+        storeFile file('key.jks')
+        storePassword '@Kwc602alfa1000@'
     }
 }
+    buildTypes {
+        release {
+            signingConfig signingConfigs.release
+            minifyEnabled false
+            shrinkResources false
+        }
+    }
 }
 
 flutter {
