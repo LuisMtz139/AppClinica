@@ -19,8 +19,8 @@ publish_to: 'none' # Remove this line if you wish to publish to pub.dev
 version: 1.1.4+14
 
 environment:
-  sdk: '>=3.0.5 <4.0.0'
-  flutter: ">=3.10.0"
+  sdk: '>=3.2.0 <4.0.0'
+  flutter: ">=3.13.0"
 
 # Dependencies specify other packages that your package needs in order to work.
 # To automatically upgrade your package dependencies to the latest versions
@@ -38,7 +38,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   flutter_localizations:
     sdk: flutter
-  intl: ^0.18.1
+  intl: ^0.19.0
   table_calendar: ^3.0.9
   google_fonts: ^5.1.0
   carousel_slider: ^5.0.0 
@@ -52,10 +52,10 @@ dependencies:
   xml: ^6.3.0
   video_player: ^2.7.2
   lottie: ^2.6.0
-  url_launcher: ^6.1.14
+  url_launcher: ^6.3.1
   font_awesome_flutter: ^10.6.0
   flutter_expandable_fab: ^2.0.0
-  easy_pdf_viewer: ^1.0.7
+  easy_pdf_viewer: ^1.0.8
   shared_preferences: ^2.2.3
   isar_flutter_libs:
     path: local_packages/isar_flutter_libs
