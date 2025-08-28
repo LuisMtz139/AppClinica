@@ -1,5 +1,5 @@
 buildscript {
-    ext.kotlin_version = '1.8.22'
+    ext.kotlin_version = '1.9.10'
     repositories {
         google()
         mavenCentral()
@@ -9,7 +9,6 @@ buildscript {
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
-
 
 allprojects {
     repositories {
@@ -22,27 +21,38 @@ rootProject.buildDir = '../build'
 
 subprojects {
     afterEvaluate { project ->
-        if (project.plugins.hasPlugin("com.android.application") ||
-                project.plugins.hasPlugin("com.android.library")) {
-            project.android {
-                compileSdkVersion 34
-
+        if (project.hasProperty("android")) {
+            android {
+                compileSdk 34
+                
                 compileOptions {
-                    sourceCompatibility JavaVersion.VERSION_11
-                    targetCompatibility JavaVersion.VERSION_11
+                    sourceCompatibility JavaVersion.VERSION_17
+                    targetCompatibility JavaVersion.VERSION_17
+                }
+                
+                // Solo aplicar kotlinOptions si el proyecto lo soporta
+                if (project.plugins.hasPlugin('kotlin-android') || 
+                    project.plugins.hasPlugin('org.jetbrains.kotlin.android')) {
+                    
+                    // Verificar que el android extension tenga el método kotlinOptions
+                    try {
+                        kotlinOptions {
+                            jvmTarget = "17"
+                        }
+                    } catch (Exception e) {
+                        // Si falla, ignorar para plugins que no lo soportan
+                        println "Warning: kotlinOptions not supported for ${project.name}"
+                    }
                 }
             }
         }
     }
 }
 
-// Evitar que los warnings se traten como errores
 subprojects {
-    tasks.withType(JavaCompile).configureEach {
-        options.compilerArgs.remove('-Werror')
-    }
-
     project.buildDir = "${rootProject.buildDir}/${project.name}"
+}
+subprojects {
     project.evaluationDependsOn(':app')
 }
 
